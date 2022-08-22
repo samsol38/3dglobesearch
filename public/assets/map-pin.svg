@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr" id="svg3873" sodipodi:docname="map pin.svg" viewBox="0 0 31 47" version="1.1" inkscape:version="0.48.3.1 r9886">
+    <title id="title2993">map pin</title
+  >
+    <sodipodi:namedview id="base" bordercolor="#666666" inkscape:pageshadow="2" inkscape:window-y="-8" pagecolor="#ffffff" inkscape:window-height="706" inkscape:grid-bbox="true" inkscape:window-maximized="1" inkscape:zoom="5.5" inkscape:window-x="-8" showgrid="true" borderopacity="1.0" inkscape:current-layer="layer1" inkscape:cx="-24.454545" inkscape:cy="30.454545" inkscape:window-width="1366" inkscape:pageopacity="0.0" inkscape:document-units="px" />
+    <g id="layer1">
+        <g transform="matrix(0.18403 0 0 0.17534 214.35 -157.87)" id="g3841">
+            <path fill="#f41922" stroke-width="5.7" stroke="#5a0000" d="m-1082.3103,1166.2948c-0.27295,-0.77942 -1.64502,-6.02747 -3.04907,-11.66199c-4.44092,-17.823 -12.12195,-36.98804 -22.5459,-56.255c-5.98438,-11.06104 -7.06689,-12.82397 -24.55115,-40c-28.25183,-43.91101 -33.21692,-56.24097 -32.17297,-79.89001c0.95728,-21.672 8.27173,-37.909 24.14893,-53.60999c13.1792,-13.03198 27.80713,-20.54901 45.60107,-23.43201c44.09705,-7.14459 86.87805,21.883 95.54602,64.828c2.02081,10.01196 1.57233,27.24304 -0.9527,36.604c-2.77002,10.26904 -13.883,31.04504 -29.58905,55.31494c-28.34802,43.80701 -39.08203,65.68701 -47.1189,96.05005c-3.11182,11.755 -4.39856,14.67297 -5.31616,12.052l-0.00012,0z" id="path3047"/>
+            <path fill="#0e232e" stroke-width="0" d="m-1046.49451,994.37402c0,18.15015 -15.41467,32.86499 -34.43054,32.86499c-19.01453,0 -34.43042,-14.71484 -34.43042,-32.86499c0,-18.15137 15.41479,-32.86505 34.43042,-32.86505s34.43054,14.71368 34.43054,32.86505z" id="path3049"/>
+        </g>
+    </g>
+</svg
+>
