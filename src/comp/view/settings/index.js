@@ -299,6 +299,43 @@ const SettingsView = forwardRef((props, ref) => {
                             {'Country'}
                         </Checkbox>
                     </Stack>
+                    <Divider
+                        marginY={5} />
+                    <Text
+                        fontSize={'md'}
+                        fontWeight={'semibold'}
+                        mb={4}
+                    >{'Show Sections : '}</Text>
+                    <Stack spacing={[1, 5]} direction={['column']}>
+                        <Checkbox
+                            size='md'
+                            disabled={getDisabledCitySearch()}
+                            onChange={onChangeCitySearch}
+                            isChecked={state?.searchPlaceFrom?.city ?? true}>
+                            {'Input Coodinates'}
+                        </Checkbox>
+                        <Checkbox
+                            size='md'
+                            disabled={getDisabledStateSearch()}
+                            onChange={onChangeStateSearch}
+                            isChecked={state?.searchPlaceFrom?.state ?? true}>
+                            {'Place Details'}
+                        </Checkbox>
+                        <Checkbox
+                            size='md'
+                            disabled={getDisabledCountrySearch()}
+                            onChange={onChangeCountrySearch}
+                            isChecked={state?.searchPlaceFrom?.country ?? true}>
+                            {'Country Details'}
+                        </Checkbox>
+                        <Checkbox
+                            size='md'
+                            disabled={getDisabledCountrySearch()}
+                            onChange={onChangeCountrySearch}
+                            isChecked={state?.searchPlaceFrom?.country ?? true}>
+                            {'TimeZone Details'}
+                        </Checkbox>
+                    </Stack>
                 </Flex>
             </SettingSectionView>
         )
@@ -307,10 +344,13 @@ const SettingsView = forwardRef((props, ref) => {
     const renderMasterSettingSection = () => {
         return (
             <Flex
-                flex={1}
+                // flex={1}
                 flexDirection={'column'}
                 overflowX={'hidden'}
-                overflowY={'auto'}>
+                maxHeight={'60vh'}
+                overflowY={'auto'}
+            // overflowY={'scroll'}
+            >
                 {renderGeneralSettings()}
                 {renderSearchSettings()}
             </Flex>
@@ -326,16 +366,24 @@ const SettingsView = forwardRef((props, ref) => {
                     onClose={onClose}
                     size={'lg'}
                     isCentered
+                    overflow={'hidden'}
                     motionPreset={'slideInBottom'}
                 >
-                    <ModalOverlay />
-                    <ModalContent>
+                    {/* <ModalOverlay /> */}
+                    <ModalOverlay
+                        bg='blackAlpha.600'
+                        backdropFilter='blur(10px)'
+                    />
+                    <ModalContent
+                        overflow={'hidden'}
+                    >
                         <ModalHeader>Settings</ModalHeader>
                         <ModalCloseButton />
                         <Divider />
                         <ModalBody
                             m={0}
-                            p={0}>
+                            p={0}
+                        >
                             {renderMasterSettingSection()}
                         </ModalBody>
                         <Divider />

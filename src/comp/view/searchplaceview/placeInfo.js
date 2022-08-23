@@ -787,7 +787,7 @@ const PlaceInfoView = (props) => {
     const renderPlaceProperty = (propertyItem, key) => {
         return (
             <Flex
-                key={key}
+                key={`${propertyItem}-${key}`}
                 flexDirection='row'
                 alignItems={'center'}
                 justifyContent={'space-between'}
@@ -800,17 +800,19 @@ const PlaceInfoView = (props) => {
                     flexGrow={1}
                     marginX={'5px'}
                 ><Divider /></Flex>
-                {['currentDateV1',
-                    'currentDateV2',
-                    'currentDate',
-                    'currentTime'].includes(propertyItem?.type) ?
+                {!lodash.isNil(propertyItem?.type) &&
+                    ['currentDateV1',
+                        'currentDateV2',
+                        'currentDate',
+                        'currentTime'].includes(propertyItem?.type) ?
                     <Code
                         fontSize={'sm'}
                         textAlign={'right'}
-                        colorScheme='linkedin'><Clock format={propertyItem?.format}
+                        colorScheme='linkedin'>
+                        <Clock format={propertyItem?.format}
                             ticking={propertyItem?.ticking}
                             blinking={propertyItem?.blinking}
-                            timezone={propertyItem?.value} /> </Code> :
+                            timezone={propertyItem?.value} /></Code> :
                     <Code
                         fontSize={'sm'}
                         textAlign={'right'}
