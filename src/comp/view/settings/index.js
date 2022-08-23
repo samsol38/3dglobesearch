@@ -4,6 +4,7 @@ import React, {
     useEffect,
     useRef,
     createRef,
+    forwardRef,
     useImperativeHandle
 } from 'react';
 
@@ -79,7 +80,7 @@ const SettingSectionView = (props) => {
     )
 }
 
-const SettingsView = React.forwardRef((props, ref) => {
+const SettingsView = forwardRef((props, ref) => {
 
     const {
         userConfig,

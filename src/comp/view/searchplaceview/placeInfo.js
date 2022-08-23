@@ -36,7 +36,8 @@ import {
 import {
     HamburgerIcon,
     MoonIcon,
-    SunIcon
+    SunIcon,
+    InfoIcon
 } from '@chakra-ui/icons'
 
 import {
@@ -46,6 +47,9 @@ import {
 import * as geolib from 'geolib';
 
 import lodash from 'lodash';
+import tzlookup from 'tz-lookup';
+import Clock from 'react-live-clock';
+
 import {
     degToDMS,
     degToDMM,
@@ -165,6 +169,8 @@ const PlaceInfoView = (props) => {
 
     const updateCoordinate = (data) =>
         setCoordinate((preState) => ({ ...preState, ...data }));
+
+    let currentTimeZoneIndex = useRef(null)
 
     /*  Life-cycles Methods */
 
@@ -398,6 +404,42 @@ const PlaceInfoView = (props) => {
             }
         }
 
+        let timezoneByPlace = tzlookup(currentPlaceItem?.latitude, currentPlaceItem?.longitude);
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            timeZone: {
+                type: 'timeZone',
+                title: 'TimeZone',
+                value: timezoneByPlace
+            }
+        }
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            currentDate: {
+                type: 'currentDate',
+                title: 'Current Date',
+                format: 'Do MMMM, YYYY, ddd',
+                ticking: false,
+                blinking: false,
+                value: timezoneByPlace
+            }
+        }
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            currentTime: {
+                type: 'currentTime',
+                title: 'Current Time',
+                format: 'hh:mm:ss a',
+                // format: 'hh:mm a',
+                ticking: true,
+                blinking: false,
+                value: timezoneByPlace
+            }
+        }
+
         updateState({
             placeDetailsObj: placeDetailsObj
         });
@@ -494,14 +536,25 @@ const PlaceInfoView = (props) => {
 
 
     const getTimeZones = (countryItem) => {
+
+        let timezoneByPlace = tzlookup(placeItem?.latitude, placeItem?.longitude);
+
         let timeZoneArray = countryItem?.timezones ?? [];
         let masterTimeZoneArray = [];
+
+        currentTimeZoneIndex.current = -1;
+
         timeZoneArray.forEach((item, index) => {
             let timeZoneObj = {};
             for (let key in item) {
                 if (!lodash.isNil(item[key]) &&
                     (lodash.isString(`${item[key]}`) &&
                         `${item[key]}`.trim() !== '')) {
+
+                    if (key === 'zoneName' &&
+                        timezoneByPlace.toLowerCase() === item[key].toLowerCase()) {
+                        currentTimeZoneIndex.current = index;
+                    }
                     timeZoneObj = {
                         ...timeZoneObj,
                         [key]: {
@@ -530,7 +583,6 @@ const PlaceInfoView = (props) => {
         if (filteredPhoneNumArray.length > 0) {
             phoneNumRegex = filteredPhoneNumArray[0][3];
         }
-
         return phoneNumRegex
     }
 
@@ -712,8 +764,7 @@ const PlaceInfoView = (props) => {
             //     defaultIndex={[]}>
             <AccordionItem>
                 <AccordionButton
-                    bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
-                >
+                    bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}>
                     <Box width={'100%'} fontSize={'md'}
                         fontWeight={'medium'} textAlign='left'>
                         {`Input Coordinates`}
@@ -749,10 +800,21 @@ const PlaceInfoView = (props) => {
                     flexGrow={1}
                     marginX={'5px'}
                 ><Divider /></Flex>
-                <Code
-                    fontSize={'sm'}
-                    textAlign={'right'}
-                    colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code>
+                {['currentDateV1',
+                    'currentDateV2',
+                    'currentDate',
+                    'currentTime'].includes(propertyItem?.type) ?
+                    <Code
+                        fontSize={'sm'}
+                        textAlign={'right'}
+                        colorScheme='linkedin'><Clock format={propertyItem?.format}
+                            ticking={propertyItem?.ticking}
+                            blinking={propertyItem?.blinking}
+                            timezone={propertyItem?.value} /> </Code> :
+                    <Code
+                        fontSize={'sm'}
+                        textAlign={'right'}
+                        colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code>}
             </Flex>
         )
     }
@@ -856,11 +918,22 @@ const PlaceInfoView = (props) => {
                                                 paddingY={1}
                                                 key={`${index}`}>
                                                 {(state?.timeZoneArray ?? []).length > 1 &&
-                                                    <Text
-                                                        as='u'
-                                                        fontWeight={'medium'}
-                                                        align={'center'}
-                                                        fontSize={'md'}>{`TimeZone ${index + 1}`}</Text>}
+                                                    <Box
+                                                        alignItems={'center'}
+                                                        justifyContent={'center'}>
+                                                        <Text
+                                                            as='u'
+                                                            fontWeight={'medium'}
+                                                            align={'center'}
+                                                            fontSize={'md'}>{`TimeZone ${index + 1}`}</Text>
+                                                        {currentTimeZoneIndex.current === index &&
+                                                            <Tooltip
+                                                                hasArrow
+                                                                placement='top'
+                                                                label={'Current TimeZone By Place'}>
+                                                                <InfoIcon ms={2} />
+                                                            </Tooltip>}
+                                                    </Box>}
                                                 <Box
                                                     mt={2}>
                                                     {Object.keys(timezoneObj).map((item, timeIndex) => {
