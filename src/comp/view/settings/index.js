@@ -142,7 +142,9 @@ const SettingsView = forwardRef((props, ref) => {
     const [state, setState] = useState({
         searchPlaceFrom: [],
         searchPlaceSectionArray: [],
-        ...userPref?.appSettings ?? {}
+        searchResultIncludesArray: searchResultIncludesArray,
+        searchPlaceSectionMasterArray: searchPlaceSectionMasterArray
+        // ...userPref?.appSettings ?? {}
     });
 
     const updateState = (data) =>
@@ -157,6 +159,7 @@ const SettingsView = forwardRef((props, ref) => {
     useEffect(() => {
         preLoadSettings();
         return () => {
+
         };
     }, []);
 
@@ -166,7 +169,7 @@ const SettingsView = forwardRef((props, ref) => {
 
 
     useEffect(() => {
-        preLoadSettings()
+        // preLoadSettings()
         // console.log("userPref: ", userPref)
     }, [userPref]);
 
@@ -180,7 +183,7 @@ const SettingsView = forwardRef((props, ref) => {
     /*  Public Interface Methods */
 
     const preLoadSettings = () => {
-        let appSettingObj = userPref?.appSettings ?? {};
+        let appSettingObj = Object.assign({}, userPref?.appSettings ?? {});
         updateState({
             ...appSettingObj
         });
@@ -188,9 +191,9 @@ const SettingsView = forwardRef((props, ref) => {
 
     const getUpdatedSettings = () => {
         let appSettingObj = {
-            coordinateFormat: state?.coordinateFormat,
-            searchPlaceFrom: state?.searchPlaceFrom,
-            searchPlaceSectionArray: state?.searchPlaceSectionArray
+            coordinateFormat: state?.coordinateFormat.slice(),
+            searchPlaceFrom: state?.searchPlaceFrom.slice(),
+            searchPlaceSectionArray: state?.searchPlaceSectionArray.slice()
         };
 
         return appSettingObj;
@@ -217,7 +220,7 @@ const SettingsView = forwardRef((props, ref) => {
     }
 
     const onChangeSearchResultIncludes = (value, type) => {
-        let searchPlaceFromArray = state?.searchPlaceFrom ?? [];
+        let searchPlaceFromArray = (state?.searchPlaceFrom ?? []).slice();
 
         if (value) {
             searchPlaceFromArray.push(type);
@@ -234,7 +237,7 @@ const SettingsView = forwardRef((props, ref) => {
     }
 
     const onChangeSearchPlaceSection = (value, type) => {
-        let searchPlaceSectionArray = state?.searchPlaceSectionArray ?? [];
+        let searchPlaceSectionArray = (state?.searchPlaceSectionArray ?? []).slice();
 
         if (value) {
             searchPlaceSectionArray.push(type);
@@ -325,7 +328,7 @@ const SettingsView = forwardRef((props, ref) => {
                     <Stack
                         spacing={[1, 5]}
                         direction={['column', 'row']}>
-                        {searchResultIncludesArray.map((item, index) => {
+                        {state?.searchResultIncludesArray.map((item, index) => {
 
                             let searchResultIncludesObj = searchResultIncludesConfig[item];
                             let type = searchResultIncludesObj?.type;
@@ -352,7 +355,7 @@ const SettingsView = forwardRef((props, ref) => {
                         mb={4}
                     >{'Show Sections : '}</Text>
                     <Stack spacing={[1, 5]} direction={['column']}>
-                        {searchPlaceSectionMasterArray.map((item, index) => {
+                        {state?.searchPlaceSectionMasterArray.map((item, index) => {
 
                             let searchPlaceSectionObj = searchPlaceSectionConfig[item];
                             let type = searchPlaceSectionObj?.type;
