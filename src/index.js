@@ -4,13 +4,23 @@ import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
 import { ChakraProvider } from '@chakra-ui/react';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider, connect } from 'react-redux';
+import { persistor, store } from './comp/redux/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <ChakraProvider>
-            <App />
-        </ChakraProvider>
+        <Provider store={store}>
+            <PersistGate
+                // loading={null}
+                loading={<div>Loading...</div>}
+                persistor={persistor}>
+                <ChakraProvider>
+                    <App />
+                </ChakraProvider>
+            </PersistGate>
+        </Provider>
     </React.StrictMode>
 );
 

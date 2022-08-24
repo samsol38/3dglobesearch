@@ -7,14 +7,32 @@ import { REHYDRATE } from 'redux-persist/src/constants';
 import Constants from '../utils/Constants';
 
 const {
-    MasterDrawerMenuType
+    MasterDrawerMenuType,
+    CoordinateFormat,
+    SearchPlaceSectionType,
+    PlaceType
 } = Constants;
 
-let initial = {
-    // userConfig: {
-    //     selectedMenuType: MasterDrawerMenuType.Search
-    // },
-    userPref: {},
+const initial = {
+    userConfig: {
+        selectedMenuType: MasterDrawerMenuType.Search
+    },
+    userPref: {
+        appSettings: {
+            coordinateFormat: CoordinateFormat.DecDeg,
+            searchPlaceFrom: [
+                PlaceType.City,
+                PlaceType.State,
+                PlaceType.Country
+            ],
+            searchPlaceSectionArray: [
+                SearchPlaceSectionType.InputCoordinates,
+                SearchPlaceSectionType.PlaceDetails,
+                SearchPlaceSectionType.CountryDetails,
+                SearchPlaceSectionType.TimeZoneDetails
+            ]
+        }
+    },
 };
 
 const reducer = (state = initial, action) => {

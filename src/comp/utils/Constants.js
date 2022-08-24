@@ -81,10 +81,18 @@ const CoordinateFormat = {
     DegDecMin: '3'
 }
 
+const SearchPlaceSectionType = {
+    InputCoordinates: 1,
+    PlaceDetails: 2,
+    CountryDetails: 3,
+    TimeZoneDetails: 4
+}
+
 export default {
     MasterDrawerMenuType,
     MasterDrawerMenuConfig,
     MasterDrawerMenuArray,
     PlaceType,
-    CoordinateFormat
+    CoordinateFormat,
+    SearchPlaceSectionType
 };

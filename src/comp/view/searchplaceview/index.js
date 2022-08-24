@@ -100,7 +100,7 @@ const SearchPlaceView = (props) => {
     }, [userConfig]);
 
     useEffect(() => {
-
+        // console.log("userPref1: ", userPref)
     }, [userPref]);
 
     useEffect(() => {
@@ -161,13 +161,21 @@ const SearchPlaceView = (props) => {
         });
     }
 
+    const isSearchPlaceFromWithinSettings = (type) => {
+        let appSettingObj = userPref?.appSettings ?? {};
+        let searchPlaceFromArray = appSettingObj?.searchPlaceFrom ??
+            [PlaceType.Country, PlaceType.State, PlaceType.City];
+
+        return searchPlaceFromArray.includes(type);
+    }
+
     const searchPlaceFromKeyword = (placeName) => {
 
         let appSettingObj = userPref.appSettings ?? {};
 
-        let isCountrySearchEnabled = appSettingObj?.searchPlaceFrom?.country ?? true;
-        let isStateSearchEnabled = appSettingObj?.searchPlaceFrom?.state ?? true;
-        let isCitySearchEnabled = appSettingObj?.searchPlaceFrom?.city ?? true;
+        let isCountrySearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.Country);
+        let isStateSearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.State);
+        let isCitySearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.City);
 
         let filterCountryArray = [],
             filterStateArray = [],

@@ -2,7 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 
 import React, {
-    useRef
+    useRef,
+    useEffect,
+    useState
 } from 'react';
 
 import {
@@ -11,36 +13,37 @@ import {
     Flex
 } from "@chakra-ui/react"
 
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider, connect } from 'react-redux';
-import { persistor, store } from './comp/redux/store';
-
 import {
     NavBarView,
     DrawerView,
     MasterContainer
 } from './comp';
 
-const App = () => {
+const App = (props) => {
 
-    const menuRef = useRef();
+    const [state, setState] = useState({
+        rehydrated: false
+    });
+
+    const updateState = (data) =>
+        setState((preState) => ({ ...preState, ...data }));
+
+    useEffect(() => {
+
+    }, []);
 
     return (
         <>
-            <Provider store={store}>
-                <PersistGate
-                    loading={null}
-                    persistor={persistor}>
-                    <Flex
-                        flex={1}
-                        direction={'column'}>
-                        <NavBarView />
-                        <Flex
-                            flex={1}
-                            direction={'row'}>
-                            <MasterContainer />
-                        </Flex >
-                        {/* <Flex
+            <Flex
+                flex={1}
+                direction={'column'}>
+                <NavBarView />
+                <Flex
+                    flex={1}
+                    direction={'row'}>
+                    <MasterContainer />
+                </Flex >
+                {/* <Flex
                             flex={1}
                             direction={'column'}
                             align={'center'}
@@ -54,9 +57,7 @@ const App = () => {
                                 Welcome to Chakra UI
                             </Text>
                         </Flex> */}
-                    </Flex >
-                </PersistGate>
-            </Provider>
+            </Flex >
         </>
     );
 }

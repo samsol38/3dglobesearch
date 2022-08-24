@@ -9,19 +9,12 @@ import Constants from '../utils/Constants';
 
 const {
     MasterDrawerMenuType,
-    CoordinateFormat
+    CoordinateFormat,
+    PlaceType
 } = Constants;
 
 let initialState = {
     userPref: {
-        appSettings: {
-            coordinateFormat: CoordinateFormat.DecDeg,
-            searchPlaceFrom: {
-                city: true,
-                state: true,
-                country: true
-            }
-        }
     },
     userConfig: {
         selectedMenuType: MasterDrawerMenuType.Search

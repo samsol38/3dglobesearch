@@ -47,12 +47,64 @@ import {
     connect
 } from 'react-redux';
 
+import lodash from 'lodash';
+
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
 
 const {
-    CoordinateFormat
+    CoordinateFormat,
+    PlaceType,
+    SearchPlaceSectionType
 } = Constants;
+
+const searchResultIncludesConfig = {
+    [PlaceType.City]: {
+        type: PlaceType.City,
+        title: 'City'
+    },
+    [PlaceType.State]: {
+        type: PlaceType.State,
+        title: 'State'
+    },
+    [PlaceType.Country]: {
+        type: PlaceType.Country,
+        title: 'Country'
+    },
+}
+
+const searchResultIncludesArray = [
+    PlaceType.City,
+    PlaceType.State,
+    PlaceType.Country
+];
+
+const searchPlaceSectionConfig = {
+    [SearchPlaceSectionType.InputCoordinates]: {
+        type: SearchPlaceSectionType.InputCoordinates,
+        title: 'Input Coodinates'
+    },
+    [SearchPlaceSectionType.PlaceDetails]: {
+        type: SearchPlaceSectionType.PlaceDetails,
+        title: 'Place Details'
+    },
+    [SearchPlaceSectionType.CountryDetails]: {
+        type: SearchPlaceSectionType.CountryDetails,
+        title: 'Country Details'
+    },
+    [SearchPlaceSectionType.TimeZoneDetails]: {
+        type: SearchPlaceSectionType.TimeZoneDetails,
+        title: 'TimeZone Details'
+    },
+}
+
+const searchPlaceSectionMasterArray = [
+    SearchPlaceSectionType.InputCoordinates,
+    SearchPlaceSectionType.PlaceDetails,
+    SearchPlaceSectionType.CountryDetails,
+    SearchPlaceSectionType.TimeZoneDetails
+];
+
 
 const SettingSectionView = (props) => {
 
@@ -88,7 +140,8 @@ const SettingsView = forwardRef((props, ref) => {
     } = props;
 
     const [state, setState] = useState({
-        searchPlaceFrom: {},
+        searchPlaceFrom: [],
+        searchPlaceSectionArray: [],
         ...userPref?.appSettings ?? {}
     });
 
@@ -108,10 +161,14 @@ const SettingsView = forwardRef((props, ref) => {
     }, []);
 
     useEffect(() => {
-        updateState({
-        });
+
     }, [userConfig]);
 
+
+    useEffect(() => {
+        preLoadSettings()
+        // console.log("userPref: ", userPref)
+    }, [userPref]);
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -132,34 +189,23 @@ const SettingsView = forwardRef((props, ref) => {
     const getUpdatedSettings = () => {
         let appSettingObj = {
             coordinateFormat: state?.coordinateFormat,
-            searchPlaceFrom: state?.searchPlaceFrom
+            searchPlaceFrom: state?.searchPlaceFrom,
+            searchPlaceSectionArray: state?.searchPlaceSectionArray
         };
 
         return appSettingObj;
     }
 
-    const getDisabledCitySearch = () => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-
-        return (searchPlaceFrom?.city ?? true) &&
-            !((searchPlaceFrom?.state ?? true) ||
-                (searchPlaceFrom?.country ?? true));
+    const getDisabledPlaceSearchOption = (type) => {
+        let searchPlaceFromArray = state?.searchPlaceFrom ?? [];
+        return searchPlaceFromArray.includes(type) &&
+            searchPlaceFromArray.length === 1;
     }
 
-    const getDisabledStateSearch = () => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-
-        return (searchPlaceFrom?.state ?? true) &&
-            !((searchPlaceFrom?.city ?? true) ||
-                (searchPlaceFrom?.country ?? true));
-    }
-
-    const getDisabledCountrySearch = () => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-
-        return (searchPlaceFrom?.country ?? true) &&
-            !((searchPlaceFrom?.city ?? true) ||
-                (searchPlaceFrom?.state ?? true));
+    const getDisabledSearchPlaceSectionOption = (type) => {
+        let searchPlaceSectionArray = state?.searchPlaceSectionArray ?? [];
+        return searchPlaceSectionArray.includes(type) &&
+            searchPlaceSectionArray.length === 1;
     }
 
     /*  UI Events Methods   */
@@ -170,39 +216,37 @@ const SettingsView = forwardRef((props, ref) => {
         });
     }
 
-    const onChangeCitySearch = (event) => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-        searchPlaceFrom = {
-            ...searchPlaceFrom,
-            city: event.target.checked
-        };
+    const onChangeSearchResultIncludes = (value, type) => {
+        let searchPlaceFromArray = state?.searchPlaceFrom ?? [];
+
+        if (value) {
+            searchPlaceFromArray.push(type);
+
+        } else {
+            searchPlaceFromArray = lodash.remove(searchPlaceFromArray, (item) => {
+                return item !== type
+            });
+        }
 
         updateState({
-            searchPlaceFrom: searchPlaceFrom
+            searchPlaceFrom: searchPlaceFromArray
         });
     }
 
-    const onChangeStateSearch = (event) => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-        searchPlaceFrom = {
-            ...searchPlaceFrom,
-            state: event.target.checked
-        };
+    const onChangeSearchPlaceSection = (value, type) => {
+        let searchPlaceSectionArray = state?.searchPlaceSectionArray ?? [];
+
+        if (value) {
+            searchPlaceSectionArray.push(type);
+
+        } else {
+            searchPlaceSectionArray = lodash.remove(searchPlaceSectionArray, (item) => {
+                return item !== type
+            });
+        }
 
         updateState({
-            searchPlaceFrom: searchPlaceFrom
-        });
-    }
-
-    const onChangeCountrySearch = (event) => {
-        let searchPlaceFrom = state?.searchPlaceFrom ?? {};
-        searchPlaceFrom = {
-            ...searchPlaceFrom,
-            country: event.target.checked
-        };
-
-        updateState({
-            searchPlaceFrom: searchPlaceFrom
+            searchPlaceSectionArray: searchPlaceSectionArray
         });
     }
 
@@ -263,6 +307,8 @@ const SettingsView = forwardRef((props, ref) => {
         )
     };
 
+
+
     const renderSearchSettings = () => {
         return (
             <SettingSectionView
@@ -276,28 +322,27 @@ const SettingsView = forwardRef((props, ref) => {
                         fontWeight={'semibold'}
                         mb={4}
                     >{'Search result includes : '}</Text>
-                    <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledCitySearch()}
-                            onChange={onChangeCitySearch}
-                            isChecked={state?.searchPlaceFrom?.city ?? true}>
-                            {'City'}
-                        </Checkbox>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledStateSearch()}
-                            onChange={onChangeStateSearch}
-                            isChecked={state?.searchPlaceFrom?.state ?? true}>
-                            {'State'}
-                        </Checkbox>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledCountrySearch()}
-                            onChange={onChangeCountrySearch}
-                            isChecked={state?.searchPlaceFrom?.country ?? true}>
-                            {'Country'}
-                        </Checkbox>
+                    <Stack
+                        spacing={[1, 5]}
+                        direction={['column', 'row']}>
+                        {searchResultIncludesArray.map((item, index) => {
+
+                            let searchResultIncludesObj = searchResultIncludesConfig[item];
+                            let type = searchResultIncludesObj?.type;
+
+                            return (
+                                <Checkbox
+                                    key={`searchFrom-${index}`}
+                                    size='md'
+                                    disabled={getDisabledPlaceSearchOption(type)}
+                                    onChange={(event) => {
+                                        onChangeSearchResultIncludes(event?.target?.checked, type)
+                                    }}
+                                    isChecked={state?.searchPlaceFrom?.includes(type)}>
+                                    {`${searchResultIncludesObj?.title}`}
+                                </Checkbox>
+                            )
+                        })}
                     </Stack>
                     <Divider
                         marginY={5} />
@@ -307,34 +352,24 @@ const SettingsView = forwardRef((props, ref) => {
                         mb={4}
                     >{'Show Sections : '}</Text>
                     <Stack spacing={[1, 5]} direction={['column']}>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledCitySearch()}
-                            onChange={onChangeCitySearch}
-                            isChecked={state?.searchPlaceFrom?.city ?? true}>
-                            {'Input Coodinates'}
-                        </Checkbox>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledStateSearch()}
-                            onChange={onChangeStateSearch}
-                            isChecked={state?.searchPlaceFrom?.state ?? true}>
-                            {'Place Details'}
-                        </Checkbox>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledCountrySearch()}
-                            onChange={onChangeCountrySearch}
-                            isChecked={state?.searchPlaceFrom?.country ?? true}>
-                            {'Country Details'}
-                        </Checkbox>
-                        <Checkbox
-                            size='md'
-                            disabled={getDisabledCountrySearch()}
-                            onChange={onChangeCountrySearch}
-                            isChecked={state?.searchPlaceFrom?.country ?? true}>
-                            {'TimeZone Details'}
-                        </Checkbox>
+                        {searchPlaceSectionMasterArray.map((item, index) => {
+
+                            let searchPlaceSectionObj = searchPlaceSectionConfig[item];
+                            let type = searchPlaceSectionObj?.type;
+
+                            return (
+                                <Checkbox
+                                    key={`searchSection-${index}`}
+                                    size='md'
+                                    disabled={getDisabledSearchPlaceSectionOption(type)}
+                                    onChange={(event) => {
+                                        onChangeSearchPlaceSection(event?.target?.checked, type)
+                                    }}
+                                    isChecked={state?.searchPlaceSectionArray?.includes(type)}>
+                                    {`${searchPlaceSectionObj?.title}`}
+                                </Checkbox>
+                            )
+                        })}
                     </Stack>
                 </Flex>
             </SettingSectionView>
