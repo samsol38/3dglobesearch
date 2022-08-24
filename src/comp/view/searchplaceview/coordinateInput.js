@@ -182,7 +182,7 @@ const CoordinateInputView = (props) => {
                                 // color='white'
                                 placement='top'
                                 label={`${state?.value}`}>
-                                <SliderThumb />
+                                <SliderThumb bg={'blue.300'} />
                             </Tooltip>
                         </Slider>
                         <NumberInput

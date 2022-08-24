@@ -819,7 +819,7 @@ const PlaceInfoView = (props) => {
                     <Code
                         fontSize={'sm'}
                         textAlign={'right'}
-                        colorScheme='linkedin'>
+                        colorScheme='purple'>
                         <Clock format={propertyItem?.format}
                             ticking={propertyItem?.ticking}
                             blinking={propertyItem?.blinking}
