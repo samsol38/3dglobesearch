@@ -424,6 +424,7 @@ const MasterGlobeView = (props) => {
         canvas.attr('width', width).attr('height', height)
         canvasOp.attr('width', width).attr('height', height)
 
+        projection.fitSize([width, height]);
         projection
             .scale((scaleFactor * Math.min(width, height)) / 2)
             .translate([width / 2, height / 2]);

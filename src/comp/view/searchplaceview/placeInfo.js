@@ -798,7 +798,7 @@ const PlaceInfoView = (props) => {
     const renderPlaceProperty = (propertyItem, key) => {
         return (
             <Flex
-                key={`${propertyItem}-${key}`}
+                key={`${propertyItem?.type}-${key}`}
                 flexDirection='row'
                 alignItems={'center'}
                 justifyContent={'space-between'}

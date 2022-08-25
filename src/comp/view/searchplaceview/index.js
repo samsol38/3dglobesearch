@@ -23,6 +23,7 @@ import {
     ListIcon,
     Icon,
     FormControl,
+    Divider,
 } from "@chakra-ui/react"
 
 import {
@@ -32,6 +33,13 @@ import {
     CheckIcon,
     CloseIcon
 } from '@chakra-ui/icons'
+
+import {
+    AutoComplete,
+    AutoCompleteInput,
+    AutoCompleteItem,
+    AutoCompleteList,
+} from "@choc-ui/chakra-autocomplete";
 
 import {
     MdSettings,
@@ -170,7 +178,6 @@ const SearchPlaceView = (props) => {
     }
 
     const searchPlaceFromKeyword = (placeName) => {
-
         let appSettingObj = userPref.appSettings ?? {};
 
         let isCountrySearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.Country);
@@ -195,7 +202,7 @@ const SearchPlaceView = (props) => {
             return;
         }
 
-        const maxResultCount = 5;
+        const maxResultCount = 15;
 
         if (isCountrySearchEnabled) {
             filterCountryArray = MasterWorldArray.filter((item) => {
@@ -360,85 +367,161 @@ const SearchPlaceView = (props) => {
 
     const searchBoxWidth = `25vw`
 
-    const renderListItem = (item, index) => {
-        return (
-            <ListItem
-                key={`${index}`}
-                bg={'chakra-body-bg'} >
-                <Flex
-                    _hover={{
-                        bg: colorMode === 'dark' ?
-                            'gray.600' : 'gray.100'
-                    }}
-                    _active={{
-                        bg: colorMode === 'dark' ?
-                            'gray.600' : 'gray.200'
-                    }}
-                    // borderRadius={'4px'}
-                    paddingY={2}
-                    paddingX={2}
-                    flexDirection={'row'}
-                    userSelect={'none'}
-                    alignItems={'center'}
-                    onClick={() => {
-                        onPressPlaceItem(item);
-                    }}>
-                    <Icon
-                        alignSelf={'flex-start'}
-                        justifySelf={'center'}
-                        // bg={'#00f3'}
-                        as={MdLocationPin}
-                        boxSize={'15px'}
-                        me={2}
-                        mt={1} />
-                    <Text
-                        //  bg={'#00f2'}
-                        fontSize='md'
-                    >{`${item.address}`}</Text>
-                </Flex>
-            </ListItem>
-        )
-    }
+    // const renderListItem = (item, index) => {
+    //     return (
+    //         <ListItem
+    //             key={`${index}`}
+    //             bg={'chakra-body-bg'}>
+    //             <Flex
+    //                 _hover={{
+    //                     bg: colorMode === 'dark' ?
+    //                         'gray.600' : 'gray.100'
+    //                 }}
+    //                 _active={{
+    //                     bg: colorMode === 'dark' ?
+    //                         'gray.600' : 'gray.200'
+    //                 }}
+    //                 // borderRadius={'4px'}
+    //                 paddingY={2}
+    //                 paddingX={2}
+    //                 flexDirection={'row'}
+    //                 userSelect={'none'}
+    //                 alignItems={'center'}
+    //                 onClick={() => {
+    //                     onPressPlaceItem(item);
+    //                 }}>
+    //                 <Icon
+    //                     alignSelf={'flex-start'}
+    //                     justifySelf={'center'}
+    //                     // bg={'#00f3'}
+    //                     as={MdLocationPin}
+    //                     boxSize={'15px'}
+    //                     me={2}
+    //                     mt={1} />
+    //                 <Text
+    //                     //  bg={'#00f2'}
+    //                     fontSize='md'
+    //                 >{`${item.address}`}</Text>
+    //             </Flex>
+    //             <Divider />
+    //         </ListItem>
+    //     )
+    // }
+
+    // const renderSearchResultList = () => {
+    //     const searchResultLength = (state?.searchResultArray ?? []).length;
+
+    //     return (
+    //         <>
+    //             {searchResultLength > 0 &&
+    //                 <Box
+    //                     mt={'1px'}
+    //                     borderRadius={'8px'}
+    //                     borderTopRadius={0}
+    //                     overflowY={'auto'}
+    //                     minWidth={`${100 * 1 / 3 - 1.5}vw`}
+    //                     minHeight={'40vh'}
+    //                     position={'absolute'}
+    //                 >
+    //                     <List spacing={0}
+    //                         borderWidth={1}
+    //                         borderColor={'gray.200'}
+    //                         position={'absolute'}
+    //                         overflowY={'auto'}
+    //                         overflowX={'hidden'}
+    //                         bg={'chakra-body-bg'}
+    //                         // width={'100%'}
+    //                         // height={'100%'}
+    //                         top={0}
+    //                         left={0}
+    //                         right={0}
+    //                     // bottom={0}
+    //                     >
+    //                         {(state?.searchResultArray ?? []).map((item, index) => {
+    //                             return renderListItem(item, index)
+    //                         })}
+    //                     </List>
+    //                 </Box>}
+    //         </>
+    //     )
+    // }
 
     const renderSearchResultList = () => {
-        const searchResultLength = (state?.searchResultArray ?? []).length;
-
         return (
-            <>
-                {searchResultLength > 0 &&
-                    <Box
-                        overflow={'hidden'}
+            <Flex
+                flex={1}>
+                <AutoComplete
+                    emptyState={<Text
+                        fontSize='md'
+                        align={'center'}
+                    >{`No place found`}</Text>}
+                >
+                    <InputGroup
+                        bg={'chakra-body-bg'}
+                        minWidth={searchBoxWidth}
+                        size='md'
+                    // maxWidth={'100%'}
+                    // minWidth={'100%'}
                     >
-                        <Box
-                            mt={'1px'}
-                            borderRadius={'8px'}
-                            borderTopRadius={0}
-                            overflowY={'auto'}
-                            minWidth={`${100 * 1 / 3 - 1.5}vw`}
-                            minHeight={'40vh'}
-                            position={'absolute'}
-                        >
-                            <List spacing={0}
-                                borderWidth={1}
-                                borderColor={'gray.200'}
-                                position={'absolute'}
-                                overflowY={'auto'}
-                                overflowX={'hidden'}
-                                bg={'chakra-body-bg'}
-                                // width={'100%'}
-                                // height={'100%'}
-                                top={0}
-                                left={0}
-                                right={0}
-                            // bottom={0}
-                            >
-                                {(state?.searchResultArray ?? []).map((item, index) => {
-                                    return renderListItem(item, index)
-                                })}
-                            </List>
-                        </Box>
-                    </Box>}
-            </>
+                        <InputLeftElement
+                            pointerEvents='none'
+                            color='gray.300'
+                            fontSize='1.2em'
+                            children={<Icon
+                                as={MdLocationPin}
+                                boxSize={'20px'} />}
+                        />
+                        <AutoCompleteInput
+                            variant="filled"
+                            placeholder='Search place name'
+                            value={searchKeyword}
+                            onChange={handleChange} />
+                        <InputRightElement
+                            children={
+                                <IconButton
+                                    onClick={onClickClearButton}
+                                    alignSelf={'center'}
+                                    variant='solid'
+                                    borderStartRadius={0}
+                                    icon={<Icon
+                                        alignSelf={'center'}
+                                        as={CloseIcon}
+                                        boxSize={'15px'} />} />}
+                        />
+                    </InputGroup>
+                    <AutoCompleteList>
+                        {(state?.searchResultArray ?? []).map((item, index) => (
+                            <AutoCompleteItem
+                                onClick={() => {
+                                    onPressPlaceItem(item);
+                                }}
+                                key={`option-${index}`}
+                                value={item?.address}
+                                fontSize='md'>
+                                <Flex
+                                    flexDirection={'column'}
+                                    flex={1}>
+                                    <Flex
+                                        flexDirection={'row'}>
+                                        <Icon
+                                            alignSelf={'flex-start'}
+                                            justifySelf={'center'}
+                                            // bg={'#00f3'}
+                                            as={MdLocationPin}
+                                            boxSize={'15px'}
+                                            me={2}
+                                            mt={1} />
+                                        <Text
+                                            //  bg={'#00f2'}
+                                            fontSize='md'
+                                        >{`${item.address}`}</Text>
+                                    </Flex>
+                                </Flex>
+                            </AutoCompleteItem>
+                        ))}
+                    </AutoCompleteList>
+                </AutoComplete >
+            </Flex>
         )
     }
 
@@ -457,12 +540,12 @@ const SearchPlaceView = (props) => {
                     ps={3}
                     pe={3}
                     flexDirection={'column'}
-                    minWidth={searchBoxWidth}
+                    // minWidth={searchBoxWidth}
                     bg={'#000'}
                 // bg={'chakra-body-bg'}
                 >
                     <Box
-                        height={'auto'}
+                        // height={'auto'}
                         // maxWidth={'25vw'}
                         // minWidth={'25vw'}
 
@@ -475,7 +558,7 @@ const SearchPlaceView = (props) => {
                         // position={'relative'}
                         zIndex={10}
                     >
-                        <form onSubmit={onSubmitEvent}>
+                        {/* <form onSubmit={onSubmitEvent}>
                             <InputGroup
                                 bg={'chakra-body-bg'}
                                 minWidth={searchBoxWidth}
@@ -510,7 +593,7 @@ const SearchPlaceView = (props) => {
                                                 boxSize={'15px'} />} />}
                                 />
                             </InputGroup>
-                        </form>
+                        </form> */}
                         {renderSearchResultList()}
                     </Box>
 
