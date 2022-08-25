@@ -118,7 +118,9 @@ const NavBarView = (props) => {
                             justifyContent="center">
                             <Heading
                                 ms={'10px'}
-                                size={'md'}>{MasterDrawerMenuConfig[state?.selectedMenuType]?.mainTitle}</Heading>
+                                size={'md'}>
+                                {MasterDrawerMenuConfig[state?.selectedMenuType]?.mainTitle}
+                            </Heading>
                         </Flex>
                     </Flex>
                     <Flex>

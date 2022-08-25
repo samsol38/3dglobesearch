@@ -88,20 +88,10 @@ const MasterContainer = (props) => {
         return (
             <>
                 <Flex
-                    flex={1}
-                    zIndex={8}>
+                    flex={1}>
+                    {getOperationView()}
                     <Flex
-                        // width={'100%'}
-                        // height={'100%'}
-                        flex={1}
-                        bg={'transparent'}
-                        pointerEvents={'none'}
-                    // position={'absolute'}
-                    >
-                        {getOperationView()}
-                    </Flex>
-                    <Flex
-                        flex={2}
+                        flexGrow={2}
                         overflow={'visible'}>
                         <MasterGlobeView />
                     </Flex>

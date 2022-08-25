@@ -43,20 +43,6 @@ const App = (props) => {
                     direction={'row'}>
                     <MasterContainer />
                 </Flex >
-                {/* <Flex
-                            flex={1}
-                            direction={'column'}
-                            align={'center'}
-                            justify={'center'}
-                            m={'5px'}>
-                            <Text
-                                bgGradient="linear(to-l, #7928CA, #FF0080)"
-                                bgClip="text"
-                                fontSize={'4xl'}
-                                fontWeight={'extrabold'}>
-                                Welcome to Chakra UI
-                            </Text>
-                        </Flex> */}
             </Flex >
         </>
     );

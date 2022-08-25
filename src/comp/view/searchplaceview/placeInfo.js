@@ -973,16 +973,20 @@ const PlaceInfoView = (props) => {
         return (
             <>
                 <Flex
-                    flexShrink={1}
+                    flex={1}
                     flexDirection={'column'}
-                    minWidth={'100%'}
+                    // minWidth={'100%'}
                     maxHeight={'80vh'}
                     overflow={'hidden'}
                     // width={`25vw`}
-                    bg={'chakra-body-bg'}
                     borderRadius={'5px'}
                     mt={2}>
-                    {renderPlaceInfo()}
+                    <Flex
+                        bg={'chakra-body-bg'}
+                        overflow={'hidden'}
+                        borderRadius={'5px'}>
+                        {renderPlaceInfo()}
+                    </Flex>
                 </Flex>
             </>
         )
