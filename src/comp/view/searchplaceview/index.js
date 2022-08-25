@@ -209,15 +209,16 @@ const SearchPlaceView = (props) => {
         const maxResultCount = 15;
 
         if (isCountrySearchEnabled) {
-            filterCountryArray = MasterWorldArray.filter((item) => {
-                return item.name.toLowerCase().includes(placeName.toLowerCase())
-            }).slice(0, maxResultCount);
 
-            filterCountryArray = filterCountryArray.map((item) => {
+            filterCountryArray = MasterWorldArray.map((item) => {
                 return lodash.omit(item, ['states']);
             });
 
-            // filterCountryArray = closetSort(filterCountryArray, placeName);
+            filterCountryArray = filterCountryArray.filter((item) => {
+                return item.name.toLowerCase().includes(placeName.toLowerCase())
+            });
+
+            filterCountryArray = closetSort(filterCountryArray, placeName);
 
             filterCountryArray = filterCountryArray.map((item) => {
                 return {
@@ -255,7 +256,7 @@ const SearchPlaceView = (props) => {
                 return lodash.omit(item, ['cities']);
             });
 
-            // filterStateArray = closetSort(filterStateArray, placeName);
+            filterStateArray = closetSort(filterStateArray, placeName);
 
             filterStateArray = filterStateArray.map((item) => {
                 return {
@@ -295,7 +296,7 @@ const SearchPlaceView = (props) => {
                 return item?.name?.toLowerCase().includes(placeName.toLowerCase())
             }).slice(0, maxResultCount);
 
-            // filterCityArray = closetSort(filterCityArray, placeName);
+            filterCityArray = closetSort(filterCityArray, placeName);
 
             filterCityArray = filterCityArray.map((item) => {
                 return {
@@ -309,9 +310,9 @@ const SearchPlaceView = (props) => {
             ...filterCityArray,
             ...filterStateArray,
             ...filterCountryArray
-        ].slice(0, maxResultCount);
+        ];
 
-        searchResultArray = closetSort(searchResultArray, placeName);
+        searchResultArray = closetSort(searchResultArray, placeName).slice(0, maxResultCount);
 
         updateState({
             placeholder: searchResultArray.length > 0 ? '' : 'No Result found',
@@ -330,7 +331,7 @@ const SearchPlaceView = (props) => {
     /*  UI Events Methods   */
 
     const handleChange = (event) => {
-        let placeName = event.target.value;
+        let placeName = event?.target?.value;
         setSearchKeyword(placeName);
     }
 
@@ -381,6 +382,7 @@ const SearchPlaceView = (props) => {
                     onSelectOption={(params) => {
                         onPressPlaceItem(params?.item?.originalValue);
                     }}
+                    suggestWhenEmpty={false}
                     emptyState={<Text
                         fontSize='md'
                         align={'center'}

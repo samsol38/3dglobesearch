@@ -34,6 +34,7 @@ import {
     SunIcon
 } from '@chakra-ui/icons'
 
+import lodash from 'lodash';
 
 const CoordinateInputView = (props) => {
 
@@ -64,9 +65,11 @@ const CoordinateInputView = (props) => {
 
 
     useEffect(() => {
-        updateState({
-            value: updatedValue
-        });
+        if (!lodash.isNil(updatedValue)) {
+            updateState({
+                value: updatedValue
+            });
+        }
     }, [updatedValue]);
 
 

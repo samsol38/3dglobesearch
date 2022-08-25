@@ -285,7 +285,7 @@ const PlaceInfoView = (props) => {
                     name: {
                         type: 'name',
                         title: 'Name',
-                        value: currentPlaceItem.name,
+                        value: currentPlaceItem?.name,
                     },
                     placeType: {
                         type: 'placeType',
@@ -295,12 +295,12 @@ const PlaceInfoView = (props) => {
                     latitude: {
                         type: 'latitude',
                         title: 'Latitude',
-                        value: currentPlaceItem.latitude
+                        value: currentPlaceItem?.latitude
                     },
                     longitude: {
                         type: 'longitude',
                         title: 'Longitude',
-                        value: currentPlaceItem.longitude
+                        value: currentPlaceItem?.longitude
                     }
                 }
 
@@ -315,7 +315,7 @@ const PlaceInfoView = (props) => {
                     name: {
                         type: 'name',
                         title: 'Name',
-                        value: currentPlaceItem.name,
+                        value: currentPlaceItem?.name,
                     },
                     placeType: {
                         type: 'placeType',
@@ -325,7 +325,7 @@ const PlaceInfoView = (props) => {
                     address: {
                         type: 'address',
                         title: 'Address',
-                        value: currentPlaceItem.address,
+                        value: currentPlaceItem?.address,
                     },
                     stateCode: {
                         type: 'stateCode',
@@ -335,17 +335,17 @@ const PlaceInfoView = (props) => {
                     countryName: {
                         type: 'countryName',
                         title: 'Country',
-                        value: currentPlaceItem.countryItem?.name,
+                        value: currentPlaceItem?.countryItem?.name,
                     },
                     latitude: {
                         type: 'latitude',
                         title: 'Place Latitude',
-                        value: currentPlaceItem.latitude
+                        value: currentPlaceItem?.latitude
                     },
                     longitude: {
                         type: 'longitude',
                         title: 'Place Longitude',
-                        value: currentPlaceItem.longitude
+                        value: currentPlaceItem?.longitude
                     }
                 }
 
@@ -360,7 +360,7 @@ const PlaceInfoView = (props) => {
                     name: {
                         type: 'name',
                         title: 'Name',
-                        value: currentPlaceItem.name,
+                        value: currentPlaceItem?.name,
                     },
                     placeType: {
                         type: 'placeType',
@@ -370,17 +370,17 @@ const PlaceInfoView = (props) => {
                     address: {
                         type: 'address',
                         title: 'Address',
-                        value: currentPlaceItem.address,
+                        value: currentPlaceItem?.address,
                     },
                     latitude: {
                         type: 'latitude',
                         title: 'Place Latitude',
-                        value: currentPlaceItem.latitude
+                        value: currentPlaceItem?.latitude
                     },
                     longitude: {
                         type: 'longitude',
                         title: 'Place Longitude',
-                        value: currentPlaceItem.longitude
+                        value: currentPlaceItem?.longitude
                     },
                     stateName: {
                         type: 'stateName',
@@ -395,7 +395,7 @@ const PlaceInfoView = (props) => {
                     countryName: {
                         type: 'countryName',
                         title: 'Country',
-                        value: currentPlaceItem.countryItem?.name,
+                        value: currentPlaceItem?.countryItem?.name,
                     },
                     // stateLatitude: {
                     //     type: 'stateLatitude',
@@ -481,7 +481,7 @@ const PlaceInfoView = (props) => {
         for (let key in placeConfigObj) {
             if (!lodash.isNil(countryItem[key]) &&
                 (lodash.isString(countryItem[key]) &&
-                    countryItem[key].trim() !== '')) {
+                    countryItem[key]?.trim() !== '')) {
                 placeDetailsObj = {
                     ...placeDetailsObj,
                     [key]: {
@@ -584,7 +584,7 @@ const PlaceInfoView = (props) => {
 
     const getPhoneNumFormat = (countryItem) => {
         let phoneNumArray = PhoneNumArray.slice();
-        let countryCode = countryItem.iso2;
+        let countryCode = countryItem?.iso2;
         let phoneNumRegex = null;
 
         let filteredPhoneNumArray = phoneNumArray.filter((item) => {
@@ -599,7 +599,7 @@ const PlaceInfoView = (props) => {
 
     const getPostalCodeFormat = (countryItem) => {
         let postalCodeArray = PostalCodeArray.slice();
-        let countryCode = countryItem.iso2;
+        let countryCode = countryItem?.iso2;
         let postalCodeObj = null;
 
         let filteredPostalCodeArray = postalCodeArray.filter((item) => {
@@ -743,20 +743,20 @@ const PlaceInfoView = (props) => {
                         <Tr>
                             <Td>Latitude</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${coordinate.latitude}`}</Td>
+                                fontSize={'x-small'}>{`${coordinate?.latitude ?? 0}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLongitude(coordinate.latitude)}`}</Td>
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLongitude(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate.latitude)}`}</Td>
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
                         </Tr>
                         <Tr>
                             <Td>Longitude</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${coordinate.longitude}`}</Td>
+                                fontSize={'x-small'}>{`${coordinate?.longitude ?? 0}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLatitude(coordinate.longitude)}`}</Td>
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLatitude(coordinate?.longitude ?? 0)}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate.longitude)}`}</Td>
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.longitude ?? 0)}`}</Td>
                         </Tr>
                     </Tbody>
                 </Table>
@@ -796,6 +796,11 @@ const PlaceInfoView = (props) => {
 
 
     const renderPlaceProperty = (propertyItem, key) => {
+
+        if (lodash.isNil(propertyItem?.value)) {
+            return;
+        }
+
         return (
             <Flex
                 key={`${propertyItem?.type}-${key}`}
