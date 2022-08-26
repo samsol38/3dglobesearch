@@ -31,7 +31,8 @@ import {
     MoonIcon,
     SunIcon,
     CheckIcon,
-    CloseIcon
+    CloseIcon,
+    Search2Icon
 } from '@chakra-ui/icons'
 
 import {
@@ -81,7 +82,8 @@ const SearchPlaceView = (props) => {
         placeName: '',
         searchResultArray: [],
         placeItem: null,
-        placeholder: 'Searching...'
+        placeholder: 'Searching...',
+        isSearching: false
     });
 
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -115,7 +117,8 @@ const SearchPlaceView = (props) => {
     useEffect(() => {
         clearSearchTimer();
         updateState({
-            placeholder: 'Searching...'
+            placeholder: 'Searching...',
+            isSearching: true
         });
         searchTimer.current = setTimeout(() => {
             searchPlaceFromKeyword(searchKeyword);
@@ -315,6 +318,7 @@ const SearchPlaceView = (props) => {
         searchResultArray = closetSort(searchResultArray, placeName).slice(0, maxResultCount);
 
         updateState({
+            isSearching: false,
             placeholder: searchResultArray.length > 0 ? '' : 'No Result found',
             searchResultArray: searchResultArray
         });
@@ -383,11 +387,23 @@ const SearchPlaceView = (props) => {
                         onPressPlaceItem(params?.item?.originalValue);
                     }}
                     suggestWhenEmpty={false}
-                    emptyState={<Text
-                        fontSize='md'
-                        align={'center'}
-                    >{`${state?.placeholder}`}</Text>}
-                >
+                    emptyState={
+                        <Flex
+                            flexDirection={'row'}
+                            alignItems={'center'}
+                            justifyContent={'center'}>
+                            {state?.isSearching &&
+                                <Icon
+                                    as={Search2Icon}
+                                    boxSize={'15px'}
+                                    me={2} />}
+                            <Text
+                                fontSize='md'
+                                align={'center'}
+                            >{`${state?.placeholder}`}
+                            </Text>
+                        </Flex>
+                    }>
                     <InputGroup
                         bg={'chakra-body-bg'}
                         size='md'

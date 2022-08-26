@@ -1,0 +1,37 @@
+{
+    "AF": {
+        "type": "AF",
+        "title": "Africa",
+        "color": "#00f"
+    },
+    "NA": {
+        "type": "NA",
+        "title": "North America",
+        "color": "#00f"
+    },
+    "OC": {
+        "type": "OC",
+        "title": "Oceania",
+        "color": "#00f"
+    },
+    "AN": {
+        "type": "AN",
+        "title": "Antarctica",
+        "color": "#00f"
+    },
+    "AS": {
+        "type": "AS",
+        "title": "Asia",
+        "color": "#00f"
+    },
+    "EU": {
+        "type": "EU",
+        "title": "Europe",
+        "color": "#00f"
+    },
+    "SA": {
+        "type": "SA",
+        "title": "South America",
+        "color": "#00f"
+    }
+}

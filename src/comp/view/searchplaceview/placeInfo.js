@@ -431,7 +431,7 @@ const PlaceInfoView = (props) => {
             currentDate: {
                 type: 'currentDate',
                 title: 'Current Date',
-                format: 'Do MMMM, YYYY, ddd',
+                format: 'Do MMM, YYYY, ddd',
                 ticking: false,
                 blinking: false,
                 value: timezoneByPlace
@@ -576,6 +576,23 @@ const PlaceInfoView = (props) => {
                     }
                 }
             }
+
+
+            let zoneName = timeZoneObj['zoneName']['value'];
+
+            timeZoneObj = {
+                ...timeZoneObj,
+                currentTime: {
+                    type: 'currentTime',
+                    title: 'Current Time',
+                    format: 'hh:mm:ss a',
+                    // format: 'hh:mm a',
+                    ticking: true,
+                    blinking: false,
+                    value: zoneName
+                }
+            }
+
             masterTimeZoneArray.push(timeZoneObj);
         });
 
@@ -815,7 +832,7 @@ const PlaceInfoView = (props) => {
                     // height={1}
                     flexGrow={1}
                     marginX={'5px'}
-                ><Divider /></Flex>
+                ><Divider minWidth={20} /></Flex>
                 {!lodash.isNil(propertyItem?.type) &&
                     ['currentDateV1',
                         'currentDateV2',
@@ -838,10 +855,15 @@ const PlaceInfoView = (props) => {
     }
 
     const renderTimeZoneProperty = (propertyItem, index) => {
+
+        if (lodash.isNil(propertyItem?.value)) {
+            return;
+        }
+
         return (
             <>
                 <Flex
-                    key={`${index}`}
+                    key={`TimeZone-${propertyItem?.value}-${index}`}
                     flexDirection='row'
                     alignItems={'center'}
                     justifyContent={'space-between'}
@@ -854,10 +876,24 @@ const PlaceInfoView = (props) => {
                         flexGrow={1}
                         marginX={'5px'}
                     ><Divider zIndex={0} /></Flex>
-                    <Code
+                    {!lodash.isNil(propertyItem?.type) &&
+                        ['currentTime'].includes(propertyItem?.type) ?
+                        <Code
+                            fontSize={'sm'}
+                            textAlign={'right'}
+                            colorScheme='purple'>
+                            <Clock format={propertyItem?.format}
+                                ticking={propertyItem?.ticking}
+                                blinking={propertyItem?.blinking}
+                                timezone={propertyItem?.value} /></Code> :
+                        <Code
+                            fontSize={'sm'}
+                            textAlign={'right'}
+                            colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code>}
+                    {/* <Code
                         fontSize={'sm'}
                         textAlign={'right'}
-                        colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code>
+                        colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code> */}
                 </Flex>
             </>
         )

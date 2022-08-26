@@ -185,7 +185,7 @@ const MasterGlobeView = (props) => {
             context: canvas.node().getContext('2d'),
             contextOp: canvasOp.node().getContext('2d'),
 
-            projection: d3.geoOrthographic().precision(0.1).clipAngle(90),
+            projection: d3.geoOrthographic().clipAngle(90),
             graticule: d3.geoGraticule10()
         };
 
@@ -203,11 +203,10 @@ const MasterGlobeView = (props) => {
 
         // return;
 
-        loadData((world, cList) => {
-            let land = topojson.feature(world, world.objects.land)
-            let countries = topojson.feature(world, world.objects.countries)
+        loadData((world, countryList) => {
+            let land = topojson.feature(world, world?.objects?.land)
+            let countries = topojson.feature(world, world?.objects?.countries)
 
-            let countryList = cList
             let names = {};
             // console.log('countries: ', countryList)
 
@@ -515,12 +514,12 @@ const MasterGlobeView = (props) => {
                 .attr("id", 'text');
 
             textGroup.selectAll("text")
-                .data(countries.features)
+                .data(countries?.features)
                 .enter()
                 .append("text")
                 .attr("id", function (d) {
                     // console.log(d.id)
-                    return `id${parseInt(d.id)}`;
+                    return `id${parseInt(d?.id)}`;
                 })
                 .attr("fill", "#fff")
                 .attr("x", (d) => {
@@ -765,6 +764,7 @@ const MasterGlobeView = (props) => {
         contextOp.clearRect(0, 0, width, height)
         fill(water, colorWater)
         stroke(graticule, colorGraticule)
+        // console.log("land: ", land)
         fill(land, colorLand)
         stroke(countries, '#fff6')
 
@@ -1512,13 +1512,13 @@ const MasterGlobeView = (props) => {
         let pos = projection.invert(d3.pointer(event, canvas.node()))
         // console.log("pos: ", pos)
 
-        return countries.features.find((f) => {
+        return countries?.features.find((f) => {
             return f.geometry.coordinates.find((c1) => {
                 return polygonContains(c1, pos) || c1.find((c2) => {
                     return polygonContains(c2, pos)
                 })
             })
-        })
+        });
     }
 
     const getCountryFromCoordinates = (coordinates) => {
@@ -1534,7 +1534,7 @@ const MasterGlobeView = (props) => {
         let pos = [coordinates?.longitude, coordinates?.latitude]
         // console.log("pos: ", pos)
 
-        return countries.features.find((f) => {
+        return countries?.features.find((f) => {
             return f.geometry.coordinates.find((c1) => {
                 return polygonContains(c1, pos) || c1.find((c2) => {
                     return polygonContains(c2, pos)
