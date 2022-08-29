@@ -54,6 +54,7 @@ import {
 } from 'react-redux';
 
 import lodash from 'lodash';
+import * as geolib from 'geolib';
 
 import PlaceInfoView from './placeInfo';
 
@@ -151,10 +152,67 @@ const SearchPlaceView = (props) => {
             return item.numeric_code.toLowerCase().includes(countryCode.toLowerCase())
         }).slice(0, 1);
 
+        let nearByDistance = 10000;
+        let nearByPlaceItem = null;
+        let nearByStateItem = null;
+        let finalNearByPlaceItem = null;
+
         if (filterCountryArray.length > 0) {
             let selectedPlaceCoordinate = userConfig?.selectedPlaceCoordinate;
 
             let countryItem = filterCountryArray[0];
+            let nearByPlaceArray = countryItem.states.filter((stateObj) => {
+                return stateObj.cities.filter((city) => {
+                    return geolib.getDistance(selectedPlaceCoordinate,
+                        {
+                            latitude: city?.latitude ?? 0,
+                            longitude: city?.longitude ?? 0,
+                        }) <= nearByDistance
+                }).length > 0;
+            });
+
+            if (nearByPlaceArray.length > 0) {
+                let nearByStateItem = nearByPlaceArray[0];
+                finalNearByPlaceItem = {
+                    ...nearByStateItem,
+                    ...selectedPlaceCoordinate,
+                    type: PlaceType.State,
+                    countryItem: lodash.omit(countryItem, ['states']),
+                    countryName: countryItem.name,
+                    address: `${nearByStateItem.name}, ${countryItem.name}`
+                };
+
+                nearByPlaceItem = nearByStateItem.cities.filter((city) => {
+                    return geolib.getDistance(selectedPlaceCoordinate,
+                        {
+                            latitude: city?.latitude ?? 0,
+                            longitude: city?.longitude ?? 0,
+                        }) <= nearByDistance
+                });
+
+                if (nearByPlaceItem.length > 0) {
+                    nearByPlaceItem = nearByPlaceItem[0];
+
+                    finalNearByPlaceItem = {
+                        ...nearByPlaceItem,
+                        ...selectedPlaceCoordinate,
+                        type: PlaceType.City,
+                        countryItem: lodash.omit(countryItem, ['states']),
+                        stateItem: lodash.omit(nearByStateItem, ['cities']),
+                        stateName: nearByStateItem?.name,
+                        countryName: countryItem.name,
+                        address: `${nearByPlaceItem.name}, ${nearByStateItem.name}, ${countryItem.name}`
+                    };
+                }
+
+                updateState({
+                    placeItem: finalNearByPlaceItem
+                });
+
+                return;
+                // console.log("nearByPlaceItem: ", nearByPlaceItem)
+            }
+
             countryItem = lodash.omit(countryItem, ['states']);
 
             countryItem = {
