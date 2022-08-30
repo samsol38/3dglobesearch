@@ -27,6 +27,7 @@ import {
 } from 'react-redux';
 
 import MasterGlobeView from '../globeview';
+import MasterGlobeRectView from '../globerectview';
 import SearchPlaceView from '../searchplaceview';
 
 import Actions from '../../redux/action';
@@ -94,6 +95,7 @@ const MasterContainer = (props) => {
                         flexGrow={2}
                         overflow={'visible'}>
                         <MasterGlobeView />
+                        {/* {<MasterGlobeRectView />} */}
                     </Flex>
                 </Flex>
             </>

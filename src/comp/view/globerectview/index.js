@@ -42,7 +42,7 @@ const {
     MasterDrawerMenuConfig
 } = Constants;
 
-const MasterGlobeView = (props) => {
+const MasterGlobeRectView = (props) => {
 
     const {
         userConfig
@@ -130,10 +130,6 @@ const MasterGlobeView = (props) => {
                 y: 40,
                 z: 0
             },
-
-            v0: null,
-            r0: null,
-            q0: null,
 
             width: null,
             height: null,
@@ -354,12 +350,6 @@ const MasterGlobeView = (props) => {
             projection
         } = elementRefObj.current;
 
-        // let rotation = projection.rotate()
-        // rotation[0] = angles.y
-        // rotation[1] = angles.x
-        // rotation[2] = angles.z
-        // projection.rotate(rotation);
-
         updateGlobeData({
             angles: angles
         });
@@ -427,12 +417,19 @@ const MasterGlobeView = (props) => {
         canvas.attr('width', width).attr('height', height)
         canvasOp.attr('width', width).attr('height', height)
 
-        projection.fitSize([width, height]);
-        projection
-            .scale((scaleFactor * Math.min(width, height)) / 2)
-            .translate([width / 2, height / 2]);
+        // projection.fitSize([width, height]);
+        // if (graticuleGroup) {
+        //     projection
+        //         .scale((scaleFactor * Math.min(width, height)) / 2)
+        // }
 
-        translate = [width / 2, height / 2];
+
+        if (graticuleGroup) {
+            projection
+                .scale((scaleFactor * Math.min(width, height)) / 2)
+                .translate(translate);
+        }
+
 
         svg.attr("width", width)
             .attr("height", height)
@@ -448,6 +445,13 @@ const MasterGlobeView = (props) => {
         });
 
         if (!graticuleGroup) {
+
+            translate = [width / 2, height / 2];
+
+            projection
+                .scale((scaleFactor * Math.min(width, height)) / 2)
+                .translate([width / 2, height / 2])
+            // .fitExtent([width, height], path);;
 
             graticuleGroup = svg.append("g")
                 .attr("id", 'graticule')
@@ -1105,9 +1109,6 @@ const MasterGlobeView = (props) => {
         // }
 
         let {
-            v0,
-            r0,
-            q0,
             canvas
         } = globeDataObj.current;
 
@@ -1115,16 +1116,7 @@ const MasterGlobeView = (props) => {
             projection
         } = elementRefObj.current;
 
-        v0 = versor.cartesian(projection
-            .invert(d3.pointer(event, canvas.node())))
-        // r0 = projection.rotate()
-        q0 = versor(r0)
-        // stopRotation()
-
         updateGlobeData({
-            v0: v0,
-            r0: r0,
-            q0: q0,
             prevDragPosition: d3.pointer(event, canvas.node())
         });
 
@@ -1135,18 +1127,16 @@ const MasterGlobeView = (props) => {
 
     const dragged = (event) => {
         let {
-            v0,
-            r0,
-            q0,
             canvas,
             translate,
             prevPosition,
             currentPosition,
             currentDragPosition,
             dragFactor = 1,
-            prevDragPosition
+            prevDragPosition,
+            width,
+            height
         } = globeDataObj.current;
-
 
         // return;
 
@@ -1154,28 +1144,38 @@ const MasterGlobeView = (props) => {
             projection
         } = elementRefObj.current;
 
-        // let v1 = versor.cartesian(projection.rotate(r0)
-        //     .invert(d3.pointer(event, canvas.node())))
-        // let q1 = versor.multiply(q0, versor.delta(v0, v1))
-        // let r1 = versor.rotation(q1);
-        // r1[1] = 0
-        // r1[2] = 0
-        // projection.rotate(r1)
-
         currentDragPosition = d3.pointer(event, canvas.node());
 
         if (prevDragPosition) {
-            // let prevDragLocation = projection.invert(prevDragPosition);
-            // let currentDragLocation = projection.invert(currentDragPosition);
 
-            translate[0] += (-prevDragPosition[0] + currentDragPosition[0]) * dragFactor;
-            translate[1] += (-prevDragPosition[1] + currentDragPosition[1]) * dragFactor;
+            if (translate[0] <= width &&
+                translate[0] >= 0) {
+                translate[0] += (-prevDragPosition[0] + currentDragPosition[0]);
+            }
+
+            if (translate[1] <= height &&
+                translate[1] >= 0) {
+                translate[1] += (-prevDragPosition[1] + currentDragPosition[1]);
+            }
+
+            if (translate[0] <= 0) {
+                translate[0] = 0;
+            }
+
+            if (translate[0] >= width) {
+                translate[0] = width;
+            }
+
+            if (translate[1] <= 0) {
+                translate[1] = 0;
+            }
+
+            if (translate[1] >= height) {
+                translate[1] = height;
+            }
 
             projection.translate(translate);
         }
-
-
-
 
         updateElementRef({
             projection: projection
@@ -1226,7 +1226,7 @@ const MasterGlobeView = (props) => {
                         projection
                     } = elementRefObj.current;
 
-                    projection.rotate(r(t));
+                    // projection.rotate(r(t));
                     updateElementRef({
                         projection: projection
                     });
@@ -1323,7 +1323,7 @@ const MasterGlobeView = (props) => {
                         projection
                     } = elementRefObj.current;
 
-                    projection.rotate(r(t));
+                    // projection.rotate(r(t));
                     updateElementRef({
                         projection: projection
                     });
@@ -1405,7 +1405,7 @@ const MasterGlobeView = (props) => {
                         projection
                     } = elementRefObj.current;
 
-                    projection.rotate(r(t));
+                    // projection.rotate(r(t));
                     updateElementRef({
                         projection: projection
                     });
@@ -1463,7 +1463,7 @@ const MasterGlobeView = (props) => {
                         projection
                     } = elementRefObj.current;
 
-                    projection.rotate(r(t));
+                    // projection.rotate(r(t));
                     updateElementRef({
                         projection: projection
                     });
@@ -1644,4 +1644,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MasterGlobeView);
+export default connect(mapStateToProps, mapDispatchToProps)(MasterGlobeRectView);
