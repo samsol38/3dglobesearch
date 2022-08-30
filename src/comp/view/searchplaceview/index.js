@@ -152,7 +152,8 @@ const SearchPlaceView = (props) => {
             return item.numeric_code.toLowerCase().includes(countryCode.toLowerCase())
         }).slice(0, 1);
 
-        let nearByDistance = 10000;
+        let nearByCityDistance = 2000;
+        let nearByStateDistance = 80000;
         let nearByPlaceItem = null;
         let nearByStateItem = null;
         let finalNearByPlaceItem = null;
@@ -167,7 +168,7 @@ const SearchPlaceView = (props) => {
                         {
                             latitude: city?.latitude ?? 0,
                             longitude: city?.longitude ?? 0,
-                        }) <= nearByDistance
+                        }) <= nearByCityDistance
                 }).length > 0;
             });
 
@@ -187,7 +188,7 @@ const SearchPlaceView = (props) => {
                         {
                             latitude: city?.latitude ?? 0,
                             longitude: city?.longitude ?? 0,
-                        }) <= nearByDistance
+                        }) <= nearByCityDistance
                 });
 
                 if (nearByPlaceItem.length > 0) {
@@ -211,6 +212,35 @@ const SearchPlaceView = (props) => {
 
                 return;
                 // console.log("nearByPlaceItem: ", nearByPlaceItem)
+            } else {
+                nearByPlaceArray = countryItem.states.filter((stateObj) => {
+                    return geolib.getDistance(selectedPlaceCoordinate,
+                        {
+                            latitude: stateObj?.latitude ?? 0,
+                            longitude: stateObj?.longitude ?? 0,
+                        }) <= nearByStateDistance
+                });
+
+                // console.log("nearByPlaceArray state: ", selectedPlaceCoordinate, nearByPlaceArray)
+
+                if (nearByPlaceArray.length > 0) {
+                    let nearByStateItem = nearByPlaceArray[0];
+
+                    finalNearByPlaceItem = {
+                        ...nearByStateItem,
+                        ...selectedPlaceCoordinate,
+                        type: PlaceType.State,
+                        countryItem: lodash.omit(countryItem, ['states']),
+                        countryName: countryItem.name,
+                        address: `${nearByStateItem.name}, ${countryItem.name}`
+                    };
+
+                    updateState({
+                        placeItem: finalNearByPlaceItem
+                    });
+
+                    return;
+                }
             }
 
             countryItem = lodash.omit(countryItem, ['states']);

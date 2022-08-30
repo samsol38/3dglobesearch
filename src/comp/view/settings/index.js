@@ -82,19 +82,19 @@ const searchResultIncludesArray = [
 const searchPlaceSectionConfig = {
     [SearchPlaceSectionType.InputCoordinates]: {
         type: SearchPlaceSectionType.InputCoordinates,
-        title: 'Input Coodinates'
+        title: 'Input coordinates'
     },
     [SearchPlaceSectionType.PlaceDetails]: {
         type: SearchPlaceSectionType.PlaceDetails,
-        title: 'Place Details'
+        title: 'Place details'
     },
     [SearchPlaceSectionType.CountryDetails]: {
         type: SearchPlaceSectionType.CountryDetails,
-        title: 'Country Details'
+        title: 'Country details'
     },
     [SearchPlaceSectionType.TimeZoneDetails]: {
         type: SearchPlaceSectionType.TimeZoneDetails,
-        title: 'TimeZone Details'
+        title: 'TimeZone details'
     },
 }
 
@@ -293,7 +293,7 @@ const SettingsView = forwardRef((props, ref) => {
                         fontSize={'md'}
                         fontWeight={'semibold'}
                         mb={4}
-                    >{'Coordinate Format : '}</Text>
+                    >{'Coordinate format : '}</Text>
                     <RadioGroup
                         defaultValue={CoordinateFormat.DecDeg}
                         onChange={onChangeCoordinateFormat}
@@ -353,7 +353,7 @@ const SettingsView = forwardRef((props, ref) => {
                         fontSize={'md'}
                         fontWeight={'semibold'}
                         mb={4}
-                    >{'Show Sections : '}</Text>
+                    >{'Show sections : '}</Text>
                     <Stack spacing={[1, 5]} direction={['column']}>
                         {state?.searchPlaceSectionMasterArray.map((item, index) => {
 

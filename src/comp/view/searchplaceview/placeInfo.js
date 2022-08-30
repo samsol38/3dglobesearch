@@ -974,7 +974,7 @@ const PlaceInfoView = (props) => {
                                             return (
                                                 <Box
                                                     paddingY={1}
-                                                    key={`${index}`}>
+                                                    key={`timezone-${index}`}>
                                                     {(state?.timeZoneArray ?? []).length > 1 &&
                                                         <Box
                                                             alignItems={'center'}
@@ -999,7 +999,9 @@ const PlaceInfoView = (props) => {
                                                         })}
                                                     </Box>
                                                     {index < (state?.timeZoneArray ?? []).length - 1 &&
-                                                        <Divider />}
+                                                        <Divider
+                                                            pt={0}
+                                                            pb={2} />}
                                                 </Box>);
                                         })}
                                     </Box>
