@@ -565,32 +565,27 @@ const SearchPlaceView = (props) => {
         const searchResultLength = (state?.searchResultArray ?? []).length;
 
         return (
-            <>
-                <Flex
-                    flex={1}
-                    pointerEvents={'auto'}
-                    pt={3}
-                    ps={3}
-                    pe={3}
-                    flexDirection={'column'}
-                    bg={'#000'}>
-                    <Box
-                        borderRadius={'5px'}
-                        overflow={'hidden'}
-                        bg={'chakra-body-bg'}>
-                        {renderSearchResultList()}
-                    </Box>
-                    <Flex
-                        flex={1}>
-                        <PlaceInfoView
-                            isPlaceVisible={userConfig?.isPlaceVisible}
-                            selectedPlaceCoordinate={userConfig?.selectedPlaceCoordinate}
-                            placeItem={state?.placeItem} />
-                    </Flex>
-
-                </Flex >
-
-            </>
+            <Flex
+                flex={1}
+                pointerEvents={'auto'}
+                pt={3}
+                ps={3}
+                pe={3}
+                flexDirection={'column'}
+                bg={'#000'}>
+                <Box
+                    borderRadius={'5px'}
+                    overflow={'hidden'}
+                    bg={'chakra-body-bg'}>
+                    {renderSearchResultList()}
+                </Box>
+                <Flex>
+                    <PlaceInfoView
+                        isPlaceVisible={userConfig?.isPlaceVisible}
+                        selectedPlaceCoordinate={userConfig?.selectedPlaceCoordinate}
+                        placeItem={state?.placeItem} />
+                </Flex>
+            </Flex>
         )
     }
 

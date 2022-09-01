@@ -687,8 +687,6 @@ const PlaceInfoView = (props) => {
 
     /*  Custom-Component sub-render Methods */
 
-
-
     const renderCoordinateInput = () => {
 
         const latitudeInputFormat = {
@@ -734,44 +732,47 @@ const PlaceInfoView = (props) => {
         return (
             <TableContainer
                 mt={2}
-                overflowX={'hidden'}>
+                overflowX={'auto'}>
                 <Table size='sm'>
                     <Thead>
                         <Tr>
-                            <Th>Coordinates</Th>
-                            <Th textAlign='center'><Tooltip
-                                hasArrow
-                                // color='white'
-                                placement='top'
-                                label={'Decimal Degrees'}>DD</Tooltip></Th>
-                            <Th textAlign='center'><Tooltip
-                                hasArrow
-                                // color='white'
-                                placement='top'
-                                label={'Degrees, Minutes & Seconds'}>DMS</Tooltip></Th>
-                            <Th textAlign='center'><Tooltip
-                                hasArrow
-                                // color='white'
-                                placement='top'
-                                label={'Degrees & Decimal Minutes'}>DDM</Tooltip></Th>
+                            <Th>Format</Th>
+                            <Th textAlign='center'>Latitude</Th>
+                            <Th textAlign='center'>Longitude</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         <Tr>
-                            <Td>Latitude</Td>
+
+                            <Td textAlign='left'><Tooltip
+                                hasArrow
+                                // color='white'
+                                placement='top'
+                                label={'Decimal Degrees'}>DD</Tooltip></Td>
                             <Td textAlign='center'
                                 fontSize={'x-small'}>{`${coordinate?.latitude ?? 0}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLongitude(coordinate?.latitude ?? 0)}`}</Td>
-                            <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
+                                fontSize={'x-small'}>{`${coordinate?.longitude ?? 0}`}</Td>
                         </Tr>
                         <Tr>
-                            <Td>Longitude</Td>
+                            <Td textAlign='left'><Tooltip
+                                hasArrow
+                                // color='white'
+                                placement='top'
+                                label={'Degrees, Minutes & Seconds'}>DMS</Tooltip></Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${coordinate?.longitude ?? 0}`}</Td>
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLongitude(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
                                 fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLatitude(coordinate?.longitude ?? 0)}`}</Td>
+                        </Tr>
+                        <Tr>
+                            <Td textAlign='left'><Tooltip
+                                hasArrow
+                                // color='white'
+                                placement='top'
+                                label={'Degrees & Decimal Minutes'}>DDM</Tooltip></Td>
+                            <Td textAlign='center'
+                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
                                 fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.longitude ?? 0)}`}</Td>
                         </Tr>
@@ -785,12 +786,8 @@ const PlaceInfoView = (props) => {
 
     const renderCoordinateMasterInput = () => {
         return (
-            // <Accordion
-            //     overflowX={'hidden'}
-            //     // width={`25vw`}
-            //     allowMultiple
-            //     defaultIndex={[]}>
-            <AccordionItem>
+            <AccordionItem
+                key={0}>
                 <AccordionButton
                     bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}>
                     <Box width={'100%'} fontSize={'md'}
@@ -800,13 +797,17 @@ const PlaceInfoView = (props) => {
                     <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel>
-                    <Box>
+                    <Box
+                        overflowY={'auto'}
+                        overflowX={'auto'}>
                         {renderCoordinateInput()}
+                        <Divider
+                            mt={4}
+                            mb={0} />
                         {renderLatLongTable()}
                     </Box>
                 </AccordionPanel>
             </AccordionItem>
-            // </Accordion >
         )
     }
 
@@ -829,7 +830,6 @@ const PlaceInfoView = (props) => {
                 <Flex
                     justify={'center'}
                     alignItems={'center'}
-                    // height={1}
                     flexGrow={1}
                     marginX={'5px'}
                 ><Divider minWidth={20} /></Flex>
@@ -915,7 +915,7 @@ const PlaceInfoView = (props) => {
                     <>
                         {isSearchPlaceSectionWithinSettings(SearchPlaceSectionType.PlaceDetails) &&
                             <AccordionItem
-                                key={0}>
+                                key={1}>
                                 <AccordionButton
                                     bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
                                 >
@@ -936,7 +936,7 @@ const PlaceInfoView = (props) => {
                             </AccordionItem>}
                         {isSearchPlaceSectionWithinSettings(SearchPlaceSectionType.CountryDetails) &&
                             <AccordionItem
-                                key={1}>
+                                key={2}>
                                 <AccordionButton
                                     bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
                                 >
@@ -958,7 +958,7 @@ const PlaceInfoView = (props) => {
                             </AccordionItem>}
                         {isSearchPlaceSectionWithinSettings(SearchPlaceSectionType.TimeZoneDetails) &&
                             <AccordionItem
-                                key={2}>
+                                key={3}>
                                 <AccordionButton
                                     bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
                                 >

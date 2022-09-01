@@ -90,11 +90,14 @@ const MasterContainer = (props) => {
             <>
                 <Flex
                     flex={1}>
-                    {getOperationView()}
                     <Flex
-                        flexGrow={2}
+                        flex={1}>
+                        {getOperationView()}
+                    </Flex>
+                    <Flex
+                        flex={2}
                         overflow={'visible'}>
-                        <MasterGlobeView />
+                        {/* <MasterGlobeView /> */}
                         {/* {<MasterGlobeRectView />} */}
                     </Flex>
                 </Flex>
