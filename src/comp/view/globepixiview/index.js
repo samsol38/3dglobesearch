@@ -19,6 +19,7 @@ import {
 import * as topojson from "topojson-client";
 import versor from "versor";
 import * as d3 from "d3";
+import * as PIXI from 'pixi.js';
 
 import './index.css';
 
@@ -42,7 +43,7 @@ const {
     MasterDrawerMenuConfig
 } = Constants;
 
-const MasterGlobeView = (props) => {
+const MasterGlobePixiView = (props) => {
 
     const {
         userConfig
@@ -60,6 +61,7 @@ const MasterGlobeView = (props) => {
     const canvasOpRef = useRef();
     const svgRef = useRef();
     const svgMarkerRef = useRef();
+
 
     const globeDataObj = useRef({});
     const elementRefObj = useRef({});
@@ -155,7 +157,7 @@ const MasterGlobeView = (props) => {
             markerLineArray: [],
             markerPolygonArray: [],
 
-            markerSize: 32,
+            markerSize: 30,
             selectedMarkerID: null,
             transform: d3.zoomIdentity,
 
@@ -168,20 +170,22 @@ const MasterGlobeView = (props) => {
             selectedCounytryID: null,
             userCountryID: null,
 
-            canvas: d3.select(canvasRef.current),
+            // canvas: d3.select(canvasRef.current),
             canvasOp: d3.select(canvasOpRef.current),
             svg: d3.select(svgRef.current),
             svgMarker: d3.select(svgMarkerRef.current),
+
+            app: null
         };
 
         const {
-            canvas,
+            // canvas,
             canvasOp,
             scaleFactor,
         } = globeDataObj.current;
 
         elementRefObj.current = {
-            context: canvas.node().getContext('2d'),
+            // context: canvas.node().getContext('2d'),
             contextOp: canvasOp.node().getContext('2d'),
 
             projection: d3.geoOrthographic().clipAngle(90),
@@ -195,7 +199,7 @@ const MasterGlobeView = (props) => {
         } = elementRefObj.current;
 
         pathRefObj.current = {
-            path: d3.geoPath(projection).context(context),
+            // path: d3.geoPath(projection).context(context),
             tempPath: d3.geoPath(projection),
             pathOp: d3.geoPath(projection).context(contextOp),
         };
@@ -229,47 +233,47 @@ const MasterGlobeView = (props) => {
 
         setAngles();
 
-        canvas
-            .call(d3.drag()
-                .on('start', dragstarted)
-                .on('drag', dragged)
-                .on('end', dragended),
-            )
-            .on('click', mouseClicked)
-            .on('mousemove', mousemove)
-            .call(d3.zoom()
-                .scaleExtent([0.8, 8])
-                .on("zoom", (event) => {
-                    let {
-                        canvas,
-                        canvasOp,
-                        scaleFactor,
-                        transform
-                    } = globeDataObj.current;
+        // canvas
+        //     .call(d3.drag()
+        //         .on('start', dragstarted)
+        //         .on('drag', dragged)
+        //         .on('end', dragended),
+        //     )
+        //     .on('click', mouseClicked)
+        //     .on('mousemove', mousemove)
+        //     .call(d3.zoom()
+        //         .scaleExtent([0.8, 8])
+        //         .on("zoom", (event) => {
+        //             let {
+        //                 canvas,
+        //                 canvasOp,
+        //                 scaleFactor,
+        //                 transform
+        //             } = globeDataObj.current;
 
-                    let projection;
+        //             let projection;
 
-                    // canvas.attr("transform", event.transform)
+        //             // canvas.attr("transform", event.transform)
 
-                    scaleFactor = event.transform.k;
+        //             scaleFactor = event.transform.k;
 
-                    updateGlobeData({
-                        transform: event.transform,
-                        scaleFactor: scaleFactor
-                    });
+        //             updateGlobeData({
+        //                 transform: event.transform,
+        //                 scaleFactor: scaleFactor
+        //             });
 
-                    if (scaleFactor < 2) {
-                        projection = d3.geoOrthographic().precision(0.1).clipAngle(90);
-                        // projection = d3.geoMercator()
-                    } else {
-                        projection = d3.geoMercator()
-                    }
+        //             if (scaleFactor < 2) {
+        //                 projection = d3.geoOrthographic().precision(0.1).clipAngle(90);
+        //                 // projection = d3.geoMercator()
+        //             } else {
+        //                 projection = d3.geoMercator()
+        //             }
 
-                    // updateProjectionOnZoom(projection);
+        //             // updateProjectionOnZoom(projection);
 
-                    scale()
-                    render()
-                }))
+        //             scale()
+        //             render()
+        //         }))
         // .on("wheel", (event) => {
 
         //     let {
@@ -399,12 +403,16 @@ const MasterGlobeView = (props) => {
 
             countries,
             names,
-            markerArray
+            markerArray,
+
+            graphics
         } = globeDataObj.current;
 
         let {
             projection,
-            graticule
+            graticule,
+            app,
+            context
         } = elementRefObj.current;
 
         let {
@@ -414,9 +422,23 @@ const MasterGlobeView = (props) => {
         width = containerRef.current.offsetWidth;
         height = containerRef.current.offsetHeight;
 
+        app = new PIXI.Application(width, height, { backgroundColor: 0xffffff });
+        context = new PIXI.Graphics();
+
+        var globedivNode = document.getElementById("globediv");
+        globedivNode.appendChild(app.view);
+
+        path = d3.geoPath(projection).context(context);
+
+        updatePathRef({
+            path: path,
+        })
+
         updateGlobeData({
             width: width,
-            height: height
+            height: height,
+            app: app,
+            graphics: graphics
         });
 
         canvas.attr('width', width).attr('height', height)
@@ -509,21 +531,6 @@ const MasterGlobeView = (props) => {
         }
 
         if (!textGroup) {
-
-            let defs = svg.append("defs");
-
-            const value = 0.15;
-
-            defs.html(`
-            <filter id="whiteOutlineEffect" color-interpolation-filters="sRGB">
-  <feMorphology in="SourceAlpha" result="MORPH" operator="dilate" radius="2" />
-  <feColorMatrix in="MORPH" result="WHITENED" type="matrix" values="-1 0 0 0 ${value}, 0 -1 0 0 ${value}, 0 0 -1 0 ${value}, 0 0 0 1 0"/>
-  <feMerge>
-    <feMergeNode in="WHITENED"/>
-    <feMergeNode in="SourceGraphic"/>
-  </feMerge>
-</filter>`)
-
             textGroup = svgMarker.append("g")
                 .attr("id", 'text');
 
@@ -542,9 +549,8 @@ const MasterGlobeView = (props) => {
                 .attr("y", (d) => {
                     return path.centroid(d)[1];
                 })
-                .attr("filter", "url(#whiteOutlineEffect)")
                 .attr("text-anchor", "middle")
-                .attr("font-size", "13px")
+                .attr("font-size", "12px")
                 .attr("font-family", "Verdana")
                 .text(function (d) {
                     return names[`${d.id}`];
@@ -620,8 +626,8 @@ const MasterGlobeView = (props) => {
 
                 return selectedMarkerID ?
                     (selectedMarkerID === d.id ?
-                        'assets/map-pin_selected-v2.svg' : 'assets/map-pin-v2.svg')
-                    : 'assets/map-pin-v2.svg';
+                        'assets/map-pin_selected.svg' : 'assets/map-pin.svg')
+                    : 'assets/map-pin.svg';
             })
             .attr("transform", (d) => {
                 let {
@@ -768,7 +774,8 @@ const MasterGlobeView = (props) => {
             projection,
             graticule,
             context,
-            contextOp
+            contextOp,
+            app
         } = elementRefObj.current;
 
         let {
@@ -831,6 +838,8 @@ const MasterGlobeView = (props) => {
             markerGroup: markerGroup
         });
 
+        app.stage.addChild(context);
+
         if (scaleFactor >= 2) {
             renderText();
         }
@@ -856,9 +865,9 @@ const MasterGlobeView = (props) => {
                 .projection(projection)
             )
             .attr("fill", '#555')
-            .attr("stroke-width", "1.9")
-            .attr("stroke-dasharray", "5,3")
-            .attr("stroke", '#ccc')
+            .attr("stroke-width", "0.4")
+            .attr("stroke-dasharray", "5, 2")
+            .attr("stroke", '#fff')
             .attr("filter", "url(#inset-shadow)")
 
         updateGlobeData({
@@ -1585,9 +1594,10 @@ const MasterGlobeView = (props) => {
                     bg={'#000'}
                     // zIndex={10}
                     className="globeContainer">
-                    <canvas
+                    {/* <canvas
                         ref={canvasRef}
-                        className="globe"></canvas>
+                        className="globe"></canvas> */}
+                    <div id="globediv" className="globe"></div>
                     <svg
                         ref={svgRef}
                         className="globesvg"></svg>
@@ -1620,4 +1630,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MasterGlobeView);
+export default connect(mapStateToProps, mapDispatchToProps)(MasterGlobePixiView);

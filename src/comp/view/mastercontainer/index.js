@@ -11,6 +11,7 @@ import {
     Heading,
     Box,
     Text,
+    Divider,
     Flex,
     Button,
     IconButton,
@@ -28,6 +29,7 @@ import {
 
 import MasterGlobeView from '../globeview';
 import MasterGlobeRectView from '../globerectview';
+import MasterGlobePixiView from '../globepixiview';
 import SearchPlaceView from '../searchplaceview';
 
 import Actions from '../../redux/action';
@@ -97,8 +99,9 @@ const MasterContainer = (props) => {
                     <Flex
                         flex={2}
                         overflow={'visible'}>
-                        {/* <MasterGlobeView /> */}
+                        <MasterGlobeView />
                         {/* {<MasterGlobeRectView />} */}
+                        {/* <MasterGlobePixiView /> */}
                     </Flex>
                 </Flex>
             </>

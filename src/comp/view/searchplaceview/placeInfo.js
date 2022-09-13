@@ -729,6 +729,9 @@ const PlaceInfoView = (props) => {
     }
 
     const renderLatLongTable = () => {
+
+        const latLngValueSize = 'x-small';
+
         return (
             <TableContainer
                 mt={2}
@@ -750,9 +753,9 @@ const PlaceInfoView = (props) => {
                                 placement='top'
                                 label={'Decimal Degrees'}>DD</Tooltip></Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${coordinate?.latitude ?? 0}`}</Td>
+                                fontSize={latLngValueSize}>{`${coordinate?.latitude ?? 0}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${coordinate?.longitude ?? 0}`}</Td>
+                                fontSize={latLngValueSize}>{`${coordinate?.longitude ?? 0}`}</Td>
                         </Tr>
                         <Tr>
                             <Td textAlign='left'><Tooltip
@@ -761,9 +764,9 @@ const PlaceInfoView = (props) => {
                                 placement='top'
                                 label={'Degrees, Minutes & Seconds'}>DMS</Tooltip></Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLongitude(coordinate?.latitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsLatitude(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsLatitude(coordinate?.longitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsLongitude(coordinate?.longitude ?? 0)}`}</Td>
                         </Tr>
                         <Tr>
                             <Td textAlign='left'><Tooltip
@@ -772,9 +775,9 @@ const PlaceInfoView = (props) => {
                                 placement='top'
                                 label={'Degrees & Decimal Minutes'}>DDM</Tooltip></Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
-                                fontSize={'x-small'}>{`${toDegreesMinutesAndSecondsV2(coordinate?.longitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2(coordinate?.longitude ?? 0)}`}</Td>
                         </Tr>
                     </Tbody>
                 </Table>

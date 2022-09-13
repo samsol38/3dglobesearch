@@ -494,8 +494,7 @@ const SearchPlaceView = (props) => {
                     }>
                     <InputGroup
                         bg={'chakra-body-bg'}
-                        size='md'
-                    >
+                        size='md'>
                         <InputLeftElement
                             pointerEvents='none'
                             color='gray.300'
