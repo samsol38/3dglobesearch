@@ -440,6 +440,7 @@ const MasterGlobeView = (props) => {
         }
 
         svgMarker.selectAll('#maskPath').remove();
+
         let mask = svgMarker.append("clipPath")
         mask.attr("id", 'maskPath')
         mask.html(`
@@ -502,7 +503,6 @@ const MasterGlobeView = (props) => {
                 });
         }
 
-        textGroup.attr("clip-path", "url(#maskPath)");
         updateGlobeData({
             textGroup: textGroup
         });
@@ -568,7 +568,8 @@ const MasterGlobeView = (props) => {
             projection: projection
         });
 
-        render();
+        // render();
+        window.requestAnimationFrame(render);
     }
 
 
@@ -817,6 +818,7 @@ const MasterGlobeView = (props) => {
             markerGroup: markerGroup
         });
 
+        // renderText();
         if (scaleFactor >= 2) {
             renderText();
         }
@@ -945,7 +947,8 @@ const MasterGlobeView = (props) => {
                 updateGlobeData({
                     currentCountry: currentCountry
                 });
-                render()
+                // render()
+                window.requestAnimationFrame(render);
             }
             return
         }
@@ -957,7 +960,8 @@ const MasterGlobeView = (props) => {
             currentCountry: currentCountry
         });
 
-        render();
+        // render();
+        window.requestAnimationFrame(render);
     }
 
     const mouseClicked = (event) => {
@@ -1026,8 +1030,8 @@ const MasterGlobeView = (props) => {
             projection: projection
         });
 
-        render()
-        // window.requestAnimationFrame(render);
+        // render()
+        window.requestAnimationFrame(render);
     }
 
     const dragended = () => {
@@ -1068,7 +1072,8 @@ const MasterGlobeView = (props) => {
                     updateElementRef({
                         projection: projection
                     });
-                    render();
+                    // render();
+                    window.requestAnimationFrame(render);
                 };
             }).on("end", () => {
                 let {
@@ -1088,7 +1093,8 @@ const MasterGlobeView = (props) => {
 
                 reloadMarkerLineArray();
                 reloadMarker();
-                render();
+                // render();
+                window.requestAnimationFrame(render);
             });
     }
 
@@ -1166,7 +1172,8 @@ const MasterGlobeView = (props) => {
                         projection: projection
                     });
 
-                    render();
+                    // render();
+                    window.requestAnimationFrame(render);
                 };
             }).on("end", () => {
 
@@ -1290,7 +1297,7 @@ const MasterGlobeView = (props) => {
 
         reloadMarkerLineArray();
         reloadMarker();
-        render();
+        renderMarker();
 
         d3.transition()
             .duration(1000)
@@ -1307,7 +1314,8 @@ const MasterGlobeView = (props) => {
                         projection: projection
                     });
 
-                    render();
+                    // render();
+                    window.requestAnimationFrame(render);
                 };
             }).on("end", () => {
 
