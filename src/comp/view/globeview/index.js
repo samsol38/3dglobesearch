@@ -439,6 +439,13 @@ const MasterGlobeView = (props) => {
             });
         }
 
+        svgMarker.selectAll('#maskPath').remove();
+        let mask = svgMarker.append("clipPath")
+        mask.attr("id", 'maskPath')
+        mask.html(`
+            <rect width="${width}" height="${height}" x="0" y="0" />
+        `);
+
         if (!textGroup) {
 
             let defs = svg.append("defs");
@@ -465,10 +472,11 @@ const MasterGlobeView = (props) => {
                         in="SourceGraphic" />
                 </feMerge>
             </filter>
-        `)
+        `);
 
             textGroup = svgMarker.append("g")
-                .attr("id", 'text');
+                .attr("id", 'text')
+                .attr("clip-path", "url(#maskPath)");
 
             textGroup.selectAll("text")
                 .data(countries?.features)
@@ -492,11 +500,12 @@ const MasterGlobeView = (props) => {
                 .text(function (d) {
                     return names[`${d.id}`];
                 });
-
-            updateGlobeData({
-                textGroup: textGroup
-            });
         }
+
+        textGroup.attr("clip-path", "url(#maskPath)");
+        updateGlobeData({
+            textGroup: textGroup
+        });
 
         if (!markerGroup) {
 
@@ -628,46 +637,47 @@ const MasterGlobeView = (props) => {
                         selectedMarkerID: null
                     });
 
-                    let {
-                        canvas,
-                        svgMarker
-                    } = globeDataObj.current;
+                    // let {
+                    //     canvas,
+                    //     svgMarker
+                    // } = globeDataObj.current;
 
-                    let country = getCountry(event);
-                    let selectedCountryCode = userConfig?.selectedCountryCode;
-                    let selectedPlaceCoordinate = null;
-                    let isPlaceVisible = false;
+                    // let country = getCountry(event);
+                    // let selectedCountryCode = userConfig?.selectedCountryCode;
+                    // let selectedPlaceCoordinate = null;
+                    // let isPlaceVisible = false;
 
-                    let position = projection.invert(d3.pointer(event, svgMarker.node()));
-                    selectedPlaceCoordinate = {
-                        latitude: `${position[1].toFixed(8)}`,
-                        longitude: `${position[0].toFixed(8)}`
-                    };
+                    // let position = projection.invert(d3.pointer(event, svgMarker.node()));
+                    // selectedPlaceCoordinate = {
+                    //     latitude: `${position[1].toFixed(8)}`,
+                    //     longitude: `${position[0].toFixed(8)}`
+                    // };
 
-                    if (!lodash.isNil(country)) {
-                        let updatedCountryCode = country?.id;
-                        props.setUserConfig({
-                            ...userConfig,
-                            selectedPlaceItem: null,
-                            isPlaceVisible: true,
-                            selectedCountryCode: updatedCountryCode,
-                            selectedInputCoordinate: null,
-                            selectedPlaceCoordinate: selectedPlaceCoordinate
-                        });
-                    } else {
-                        props.setUserConfig({
-                            ...userConfig,
-                            selectedPlaceItem: null,
-                            isPlaceVisible: false,
-                            selectedCountryCode: null,
-                            selectedInputCoordinate: null,
-                            selectedPlaceCoordinate: selectedPlaceCoordinate
-                        });
-                    }
+                    // if (!lodash.isNil(country)) {
+                    //     let updatedCountryCode = country?.id;
+                    //     props.setUserConfig({
+                    //         ...userConfig,
+                    //         selectedPlaceItem: null,
+                    //         isPlaceVisible: true,
+                    //         selectedCountryCode: updatedCountryCode,
+                    //         selectedInputCoordinate: null,
+                    //         selectedPlaceCoordinate: selectedPlaceCoordinate
+                    //     });
+                    // } else {
+                    //     props.setUserConfig({
+                    //         ...userConfig,
+                    //         selectedPlaceItem: null,
+                    //         isPlaceVisible: false,
+                    //         selectedCountryCode: null,
+                    //         selectedInputCoordinate: null,
+                    //         selectedPlaceCoordinate: selectedPlaceCoordinate
+                    //     });
+                    // }
 
                     reloadMarker();
                     reloadMarkerLineArray();
                     renderMarker();
+                    addClickedMarkerToFindCountry(event);
                 })
             );
 
@@ -962,15 +972,6 @@ const MasterGlobeView = (props) => {
             transform
         } = globeDataObj.current;
 
-
-        // projection.translate(transform.x, transform.y);
-
-        // return;
-
-        // if (scaleFactor > 2) {
-        //     return;
-        // }
-
         let {
             v0,
             r0,
@@ -1026,6 +1027,7 @@ const MasterGlobeView = (props) => {
         });
 
         render()
+        // window.requestAnimationFrame(render);
     }
 
     const dragended = () => {
@@ -1171,7 +1173,7 @@ const MasterGlobeView = (props) => {
             });
     }
 
-    const addClickedMarkerToFindCountry = (event) => {
+    const addClickedMarkerToFindCountry = async (event) => {
         let {
             width,
             height,
@@ -1201,8 +1203,9 @@ const MasterGlobeView = (props) => {
             longitude: `${pos[0].toFixed(8)}`
         };
 
-        props.setUserConfig({
+        await props.setUserConfig({
             ...userConfig,
+            selectedInputCoordinate: null,
             isPlaceVisible: isPlaceVisible,
             selectedCountryCode: selectedCountryCode,
             selectedPlaceCoordinate: selectedPlaceCoordinate
@@ -1245,7 +1248,7 @@ const MasterGlobeView = (props) => {
                     updateElementRef({
                         projection: projection
                     });
-                    render();
+                    window.requestAnimationFrame(render);
                 };
             }).on("end", () => {
 
@@ -1303,6 +1306,7 @@ const MasterGlobeView = (props) => {
                     updateElementRef({
                         projection: projection
                     });
+
                     render();
                 };
             }).on("end", () => {
