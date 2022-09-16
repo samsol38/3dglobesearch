@@ -25,7 +25,7 @@ const MasterDrawerMenuConfig = {
     [MasterDrawerMenuType.Search]: {
         type: MasterDrawerMenuType.Search,
         title: 'Search',
-        mainTitle: 'Search Place',
+        mainTitle: '3D Globe Search',
         icon: MdSearch
     },
     [MasterDrawerMenuType.Location]: {

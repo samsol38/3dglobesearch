@@ -945,7 +945,7 @@ const PlaceInfoView = (props) => {
                                 >
                                     <Box width={'100%'} fontSize={'md'}
                                         fontWeight={'medium'} textAlign='left'>
-                                        Country Details
+                                        {`Country Details - ${state?.countryDetailsObj?.name?.value}`}
                                     </Box>
                                     <AccordionIcon />
                                 </AccordionButton>

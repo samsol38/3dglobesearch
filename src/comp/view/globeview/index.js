@@ -34,6 +34,19 @@ import Constants from '../../utils/Constants';
 
 import * as geolib from 'geolib';
 
+import {
+    getVisibility,
+    polygonContains,
+
+    // fillLand,
+    // fillWater,
+    fill,
+
+    stroke,
+    strokePath,
+    // fillPath
+} from './globeutils';
+
 // import * as worldGeoJSON from "../../data/world.geojson";
 // import * as countriesTSV from "../../data/countries.tsv";
 
@@ -86,7 +99,6 @@ const MasterGlobeView = (props) => {
     /*  Life-cycles Methods */
 
     useEffect(() => {
-
         // console.log(containerRef.current.offsetWidth)
         initData();
         return () => {
@@ -134,8 +146,8 @@ const MasterGlobeView = (props) => {
             r0: null,
             q0: null,
 
-            width: null,
-            height: null,
+            width: containerRef.current.offsetWidth,
+            height: containerRef.current.offsetHeight,
 
             currentCountry: null,
 
@@ -178,13 +190,15 @@ const MasterGlobeView = (props) => {
             canvas,
             canvasOp,
             scaleFactor,
+            width,
+            height
         } = globeDataObj.current;
 
         elementRefObj.current = {
             context: canvas.node().getContext('2d'),
             contextOp: canvasOp.node().getContext('2d'),
 
-            projection: d3.geoOrthographic().clipAngle(90),
+            projection: d3.geoOrthographic().precision(0.1).clipAngle(90),
             graticule: d3.geoGraticule10()
         };
 
@@ -222,12 +236,17 @@ const MasterGlobeView = (props) => {
 
             window.addEventListener('resize', () => {
                 updateState({});
+                initDomElements();
                 scale();
             })
+
+            initDomElements();
             scale();
         });
 
         setAngles();
+
+        console.log(width, height)
 
         canvas
             .call(d3.drag()
@@ -239,6 +258,7 @@ const MasterGlobeView = (props) => {
             .on('mousemove', mousemove)
             .call(d3.zoom()
                 .scaleExtent([0.8, 8])
+                .translateExtent([[0, 0], [width, height]])
                 .on("zoom", (event) => {
                     let {
                         canvas,
@@ -258,87 +278,18 @@ const MasterGlobeView = (props) => {
                         scaleFactor: scaleFactor
                     });
 
-                    if (scaleFactor < 2) {
-                        projection = d3.geoOrthographic().precision(0.1).clipAngle(90);
-                        // projection = d3.geoMercator()
-                    } else {
-                        projection = d3.geoMercator()
-                    }
+                    // if (scaleFactor < 2) {
+                    //     projection = d3.geoOrthographic().precision(0.1).clipAngle(90);
+                    //     // projection = d3.geoMercator()
+                    // } else {
+                    //     projection = d3.geoMercator()
+                    // }
 
                     // updateProjectionOnZoom(projection);
 
                     scale()
-                    render()
+                    // render()
                 }))
-        // .on("wheel", (event) => {
-
-        //     let {
-        //         scaleFactor
-        //     } = globeDataObj.current;
-
-        //     let direction = event.wheelDelta < 0 ? 'down' : 'up';
-        //     // zoom(direction === 'up' ? d : d.parent);
-        //     // alert(direction)
-
-        //     let scaleNum = 0.35;
-        //     let projection;
-
-        //     if (direction === 'up') {
-        //         if (scaleFactor > 10) {
-        //             return
-        //         }
-        //         scaleFactor = scaleFactor + scaleNum;
-        //     } else {
-        //         if (scaleFactor < 0.9) {
-        //             return
-        //         }
-        //         scaleFactor = scaleFactor - scaleNum;
-
-        //     }
-
-        //     if (scaleFactor > 2) {
-        //         // projection = d3.geoOrthographic().precision(0.1).clipAngle(90);
-        //         projection = d3.geoMercator()
-        //     } else {
-        //         projection = d3.geoMercator()
-        //     }
-
-        //     updateProjectionOnZoom(projection);
-
-        //     updateGlobeData({
-        //         scaleFactor: scaleFactor
-        //     });
-        //     scale()
-        //     render()
-        // });
-    }
-
-    const updateProjectionOnZoom = (updatedProjection) => {
-        let {
-            projection,
-            context,
-            contextOp
-        } = elementRefObj.current;
-
-        let {
-            path,
-            tempPath,
-            pathOp
-        } = pathRefObj.current;
-
-        updateElementRef({
-            projection: updatedProjection
-        });
-
-        updatePathRef({
-            path: d3.geoPath(updatedProjection).context(context),
-            tempPath: d3.geoPath(updatedProjection),
-            pathOp: d3.geoPath(updatedProjection).context(contextOp),
-        });
-
-        reloadMarkerLineArray();
-        reloadMarker();
-        render();
     }
 
     const setAngles = () => {
@@ -365,21 +316,10 @@ const MasterGlobeView = (props) => {
         });
     }
 
-    const getVisibility = (d) => {
-        let {
-            tempPath
-        } = pathRefObj.current;
-
-        // console.log(d)
-        const visible = tempPath(
-            { type: 'Point', coordinates: [d.long, d.lat] });
-
-        return visible ? 'visible' : 'hidden';
-    }
-
     /*  UI Events Methods   */
 
-    const scale = () => {
+    const initDomElements = () => {
+
         let {
             width,
             height,
@@ -414,17 +354,10 @@ const MasterGlobeView = (props) => {
         width = containerRef.current.offsetWidth;
         height = containerRef.current.offsetHeight;
 
-        updateGlobeData({
-            width: width,
-            height: height
-        });
-
         canvas.attr('width', width).attr('height', height)
         canvasOp.attr('width', width).attr('height', height)
 
-        projection.fitSize([width, height]);
-        projection
-            .scale((scaleFactor * Math.min(width, height)) / 2)
+        projection.fitSize([width, height])
             .translate([width / 2, height / 2]);
 
         svg.attr("width", width)
@@ -434,6 +367,8 @@ const MasterGlobeView = (props) => {
             .attr("height", height)
 
         updateGlobeData({
+            width: width,
+            height: height,
             canvas: canvas,
             canvasOp: canvasOp,
             svg: svg,
@@ -462,43 +397,39 @@ const MasterGlobeView = (props) => {
             let defs = svg.append("defs");
 
             defs.html(`
-            <filter id='inset-shadow'>
+            <filter 
+                id='inset-shadow'>
             <!-- Shadow offset -->
-            <feOffset
+                <feOffset
                     dx='0'
-                    dy='0'
-                  />
-            <!-- Shadow blur -->
-          <feGaussianBlur
+                    dy='0'/>
+                <!-- Shadow blur -->
+                <feGaussianBlur
                     stdDeviation='15'
-                    result='offset-blur'
-                  />
+                    result='offset-blur'/>
             <!-- Invert drop shadow to make an inset shadow-->
-            <feComposite
+                <feComposite
                     operator='out'
                     in='SourceGraphic'
                     in2='offset-blur'
-                    result='inverse'
-                  />
+                    result='inverse'/>
             <!-- Cut colour inside shadow -->
-            <feFlood
+                <feFlood
                     flood-color='#000'
                     flood-opacity='1'
-                    result='color'
-                  />
-            <feComposite
+                    result='color'/>
+                <feComposite
                     operator='in'
                     in='color'
                     in2='inverse'
-                    result='shadow'
-                  />
+                    result='shadow'/>
             <!-- Placing shadow over element -->
-            <feComposite
+                <feComposite
                     operator='over'
                     in='shadow'
-                    in2='SourceGraphic'
-                  /> 
-          </filter>`)
+                    in2='SourceGraphic'/> 
+            </filter>
+        `)
 
             landGroup = svg.append("g")
                 .attr("id", 'land');
@@ -511,18 +442,30 @@ const MasterGlobeView = (props) => {
         if (!textGroup) {
 
             let defs = svg.append("defs");
-
-            const value = 0.15;
+            const value = 0.19;
 
             defs.html(`
-            <filter id="whiteOutlineEffect" color-interpolation-filters="sRGB">
-  <feMorphology in="SourceAlpha" result="MORPH" operator="dilate" radius="2" />
-  <feColorMatrix in="MORPH" result="WHITENED" type="matrix" values="-1 0 0 0 ${value}, 0 -1 0 0 ${value}, 0 0 -1 0 ${value}, 0 0 0 1 0"/>
-  <feMerge>
-    <feMergeNode in="WHITENED"/>
-    <feMergeNode in="SourceGraphic"/>
-  </feMerge>
-</filter>`)
+            <filter 
+                id="blackOutlineEffect"
+                color-interpolation-filters="sRGB">
+                <feMorphology 
+                    in="SourceAlpha" 
+                    result="MORPH" 
+                    operator="dilate" 
+                    radius="2.0" />
+                <feColorMatrix 
+                    in="MORPH" 
+                    result="WHITENED" 
+                    type="matrix" 
+                    values="-1 0 0 0 ${value}, 0 -1 0 0 ${value}, 0 0 -1 0 ${value}, 0 0 0 1 0" />
+                <feMerge>
+                    <feMergeNode 
+                        in="WHITENED" />
+                    <feMergeNode 
+                        in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        `)
 
             textGroup = svgMarker.append("g")
                 .attr("id", 'text');
@@ -542,9 +485,9 @@ const MasterGlobeView = (props) => {
                 .attr("y", (d) => {
                     return path.centroid(d)[1];
                 })
-                .attr("filter", "url(#whiteOutlineEffect)")
+                .attr("filter", "url(#blackOutlineEffect)")
                 .attr("text-anchor", "middle")
-                .attr("font-size", "13px")
+                .attr("font-size", "13.6px")
                 .attr("font-family", "Verdana")
                 .text(function (d) {
                     return names[`${d.id}`];
@@ -575,8 +518,48 @@ const MasterGlobeView = (props) => {
             svg: svg,
             svgMarker: svgMarker
         });
+    }
 
-        render()
+    const scale = () => {
+        let {
+            width,
+            height,
+
+            canvas,
+            canvasOp,
+            scaleFactor,
+
+            svg,
+            svgMarker,
+            graticuleGroup,
+            colorGraticule,
+
+            landGroup,
+            textGroup,
+            markerGroup,
+
+            countries,
+            names,
+            markerArray
+        } = globeDataObj.current;
+
+        let {
+            projection,
+            graticule
+        } = elementRefObj.current;
+
+        let {
+            path
+        } = pathRefObj.current;
+
+        projection
+            .scale((scaleFactor * Math.min(width, height)) / 2);
+
+        updateElementRef({
+            projection: projection
+        });
+
+        render();
     }
 
 
@@ -595,7 +578,8 @@ const MasterGlobeView = (props) => {
         } = elementRefObj.current;
 
         let {
-            path
+            path,
+            tempPath
         } = pathRefObj.current;
 
         markerGroup.selectAll("image").remove();
@@ -610,7 +594,7 @@ const MasterGlobeView = (props) => {
                 return d.id
             })
             .attr('visibility', (d) => {
-                return getVisibility(d)
+                return getVisibility(tempPath, d)
             })
             .attr('pointer-events', "visiblePainted")
             .attr("xlink:href", (d) => {
@@ -683,7 +667,7 @@ const MasterGlobeView = (props) => {
 
                     reloadMarker();
                     reloadMarkerLineArray();
-                    render();
+                    renderMarker();
                 })
             );
 
@@ -736,7 +720,8 @@ const MasterGlobeView = (props) => {
 
         reloadMarker();
         reloadMarkerLineArray();
-        render();
+        renderMarker();
+        mousemove(event);
     }
 
     const render = () => {
@@ -772,33 +757,74 @@ const MasterGlobeView = (props) => {
         } = elementRefObj.current;
 
         let {
-            path
+            path,
+            pathOp,
+            tempPath
         } = pathRefObj.current;
 
-        context.clearRect(0, 0, width, height)
-        contextOp.clearRect(0, 0, width, height)
-        fill(water, colorWater)
-        stroke(graticule, colorGraticule)
+        context.clearRect(0, 0, width, height);
+        contextOp.clearRect(0, 0, width, height);
+
+        fill({
+            context,
+            path
+        }, water, colorWater);
+
+        stroke({
+            context,
+            path
+        }, graticule, colorGraticule);
+
         // console.log("land: ", land)
-        fill(land, colorLand)
-        stroke(countries, '#fff6')
+        fill({
+            context,
+            path
+        }, land, colorLand);
+
+        stroke({
+            context,
+            path
+        }, countries, '#fff6')
 
         if (markerLineArray.length > 1) {
             markerLineArray.forEach((item) => {
-                strokePath(item, '#f00')
+                strokePath({
+                    contextOp,
+                    pathOp
+                }, item, '#f00')
             });
         }
-
-        // markerPolygonArray.forEach((item) => {
-        //     fillPath(item, 'colorPolygon')
-        // });
 
         textGroup.selectAll("text").attr("opacity", `${scaleFactor > 2 ? 1 : 0}`);
         landGroup.selectAll("path").remove();
 
+        renderMarker();
+        renderSelectedCountry();
+
+        updateGlobeData({
+            textGroup: textGroup,
+            landGroup: landGroup,
+            markerGroup: markerGroup
+        });
+
+        if (scaleFactor >= 2) {
+            renderText();
+        }
+    }
+
+    const renderMarker = () => {
+        let {
+            markerGroup,
+            markerSize
+        } = globeDataObj.current;
+
+        let {
+            tempPath
+        } = pathRefObj.current;
+
         markerGroup.selectAll("image")
             .attr('visibility', (d) => {
-                return getVisibility(d)
+                return getVisibility(tempPath, d)
             })
             .attr("transform", (d) => {
                 let {
@@ -808,10 +834,21 @@ const MasterGlobeView = (props) => {
                 let p = projection([d.long, d.lat]);
                 return `translate(${p[0] - markerSize / 2}, ${p[1] - markerSize})`;
             })
+    }
+
+    const renderSelectedCountry = () => {
+
+        let {
+            currentCountry,
+            textGroup,
+            selectedCounytryID
+        } = globeDataObj.current;
+
+        let {
+            path
+        } = pathRefObj.current;
 
         if (currentCountry) {
-
-            // console.log(currentCountry.id)
             showCountry();
 
             selectedCounytryID = `text#id${parseInt(currentCountry.id)}`;
@@ -826,14 +863,8 @@ const MasterGlobeView = (props) => {
         }
 
         updateGlobeData({
-            textGroup: textGroup,
-            landGroup: landGroup,
-            markerGroup: markerGroup
+            textGroup: textGroup
         });
-
-        if (scaleFactor >= 2) {
-            renderText();
-        }
     }
 
     const showCountry = () => {
@@ -846,7 +877,7 @@ const MasterGlobeView = (props) => {
             projection
         } = elementRefObj.current;
 
-        landGroup.selectAll("path").remove();
+        // landGroup.selectAll("path").remove();
 
         landGroup.selectAll("path")
             .data([currentCountry])
@@ -856,7 +887,7 @@ const MasterGlobeView = (props) => {
                 .projection(projection)
             )
             .attr("fill", '#555')
-            .attr("stroke-width", "1.9")
+            .attr("stroke-width", "1.85")
             .attr("stroke-dasharray", "5,3")
             .attr("stroke", '#ccc')
             .attr("filter", "url(#inset-shadow)")
@@ -873,7 +904,8 @@ const MasterGlobeView = (props) => {
         } = globeDataObj.current;
 
         let {
-            path
+            path,
+            tempPath
         } = pathRefObj.current;
 
         textGroup.selectAll("text")
@@ -882,183 +914,11 @@ const MasterGlobeView = (props) => {
             })
             .attr("y", (d) => {
                 return path.centroid(d)[1];
-            })
+            });
 
         updateGlobeData({
             textGroup: textGroup
         });
-    }
-
-    const fillLand = (obj, color) => {
-
-        let {
-            width,
-            height
-        } = globeDataObj.current;
-
-        let {
-            context
-        } = elementRefObj.current;
-
-        let {
-            path
-        } = pathRefObj.current;
-
-        context.beginPath()
-        path(obj)
-        context.shadowOffsetX = 3;
-        context.shadowOffsetY = 3;
-        context.shadowBlur = 5;
-        context.shadowColor = '#0008';
-
-        var lingrad = context.createLinearGradient(0, 0, width, height);
-
-        // // addColorStop(position, color) position = 0.0 and 1.0
-        lingrad.addColorStop(0, '#333');
-        lingrad.addColorStop(0.2, '#000a');
-        lingrad.addColorStop(0.4, '#333');
-        lingrad.addColorStop(0.8, '#000d');
-        lingrad.addColorStop(1, '#333');
-
-        context.fillStyle = lingrad;
-        context.fill()
-    }
-
-    const fillWater = (obj, color) => {
-
-        let {
-            context
-        } = elementRefObj.current;
-
-        let {
-            path
-        } = pathRefObj.current;
-
-        context.beginPath()
-        path(obj)
-        context.shadowOffsetX = 3;
-        context.shadowOffsetY = 3;
-        context.shadowBlur = 5;
-        context.shadowColor = '#0008';
-
-        const img = new Image();
-        img.src = './data/tt2.png';
-
-        const pattern = context.createPattern(img, 'repeat');
-        context.fillStyle = pattern;
-        // context.fillStyle = color
-        context.fill()
-    }
-
-    const fill = (obj, color) => {
-
-        // console.log(obj)
-
-        let {
-            context
-        } = elementRefObj.current;
-
-        let {
-            path
-        } = pathRefObj.current;
-
-        context.beginPath()
-        path(obj)
-
-        context.shadowOffsetX = 3;
-        context.shadowOffsetY = 3;
-        context.shadowBlur = 5;
-        context.shadowColor = '#0008';
-
-        context.fillStyle = color
-        context.fill()
-    }
-
-    const stroke = (obj, color) => {
-        let {
-            context
-        } = elementRefObj.current;
-
-        let {
-            path
-        } = pathRefObj.current;
-
-        context.beginPath()
-        path(obj)
-        context.shadowBlur = 0;
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
-        context.lineWidth = 0.6;
-        context.setLineDash([3, 2])
-        context.strokeStyle = color;
-        context.stroke()
-    }
-
-    const strokePath = (obj, color) => {
-        let {
-            contextOp
-        } = elementRefObj.current;
-
-        let {
-            pathOp
-        } = pathRefObj.current;
-
-        contextOp.beginPath()
-        pathOp(obj)
-        contextOp.shadowBlur = 0;
-        contextOp.shadowOffsetX = 0;
-        contextOp.shadowOffsetY = 0;
-        // context.shadowColor = '#0008';
-        contextOp.lineWidth = 1.5;
-        contextOp.setLineDash([4, 2])
-        contextOp.strokeStyle = color;
-        contextOp.stroke()
-    }
-
-    const fillPath = (obj, color) => {
-
-        // console.log(obj)
-
-        let {
-            contextOp
-        } = elementRefObj.current;
-
-        let {
-            pathOp
-        } = pathRefObj.current;
-
-        contextOp.beginPath()
-        pathOp(obj)
-
-        contextOp.shadowOffsetX = 3;
-        contextOp.shadowOffsetY = 3;
-        contextOp.shadowBlur = 5;
-        contextOp.shadowColor = '#000';
-
-        contextOp.fillStyle = color
-        contextOp.fill()
-    }
-
-    const polygonContains = (polygon, point) => {
-        let inside = false;
-
-        let n = polygon.length;
-        let p = polygon[n - 1];
-        let x = point[0], y = point[1];
-        let x0 = p[0], y0 = p[1];
-        let x1, y1;
-        for (let i = 0; i < n; ++i) {
-            p = polygon[i];
-            x1 = p[0];
-            y1 = p[1];
-            if (((y1 > y) !== (y0 > y)) && (x < (x0 - x1) * (y - y1) / (y0 - y1) + x1)) {
-                inside = !inside
-            }
-            x0 = x1;
-            y0 = y1;
-        }
-
-        return inside;
     }
 
     const mousemove = (event) => {
@@ -1067,7 +927,8 @@ const MasterGlobeView = (props) => {
             currentCountry
         } = globeDataObj.current;
 
-        let c = getCountry(event)
+        let c = getCountry(event);
+
         if (!c) {
             if (currentCountry) {
                 currentCountry = null;
@@ -1086,8 +947,7 @@ const MasterGlobeView = (props) => {
             currentCountry: currentCountry
         });
 
-        render()
-        // enter(c)
+        render();
     }
 
     const mouseClicked = (event) => {
@@ -1288,7 +1148,7 @@ const MasterGlobeView = (props) => {
 
         reloadMarkerLineArray();
         reloadMarker();
-        render();
+        renderMarker();
 
         d3.transition()
             .duration(1000)
@@ -1370,7 +1230,7 @@ const MasterGlobeView = (props) => {
 
         reloadMarkerLineArray();
         reloadMarker();
-        render();
+        renderMarker();
 
         d3.transition()
             .duration(1000)

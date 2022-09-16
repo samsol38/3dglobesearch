@@ -14,7 +14,8 @@ import {
     Text,
     Flex,
     Button,
-    IconButton
+    IconButton,
+    Icon
 } from "@chakra-ui/react"
 
 import {
@@ -23,6 +24,14 @@ import {
     SunIcon,
     SettingsIcon
 } from '@chakra-ui/icons'
+
+import {
+    FaGlobeAfrica
+} from "react-icons/fa";
+
+// import {
+//     FaGlobeAfrica
+// } from "react-icons/bs";
 
 import {
     connect
@@ -105,13 +114,26 @@ const NavBarView = (props) => {
                     <Flex
                         flexDirection={'row'}
                         justifyContent="flex-start"
-                        alignItems="center">
-                        <IconButton
+                        alignItems="center"
+                        paddingY={1}>
+                        {/* <IconButton
                             ref={btnRef}
                             variant='unstyled'
                             icon={<HamburgerIcon
                                 boxSize={'20px'} />}
-                            onClick={onOpen} />
+                            onClick={onOpen} /> */}
+                        {/* <IconButton
+                            variant='unstyled'
+                            icon={<Icon
+                                alignSelf={'center'}
+                                as={FaGlobeAfrica}
+                                boxSize={'32px'} />}
+                        /> */}
+                        <Icon
+                            alignSelf={'center'}
+                            as={FaGlobeAfrica}
+                            boxSize={'25px'}
+                        />
                         <Flex
                             flexDirection={'row'}
                             alignItems="center"
@@ -132,6 +154,12 @@ const NavBarView = (props) => {
                                 <SunIcon
                                     boxSize={'20px'} />}
                             onClick={toggleColorMode} />
+                        {/* <IconButton
+                            ms={3}
+                            variant='link'
+                            icon={<SettingsIcon
+                                boxSize={'20px'} />}
+                        /> */}
                         <IconButton
                             ms={3}
                             me={1}
