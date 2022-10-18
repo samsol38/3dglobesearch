@@ -58,79 +58,6 @@ const {
     SearchPlaceSectionType
 } = Constants;
 
-const searchResultIncludesConfig = {
-    [PlaceType.City]: {
-        type: PlaceType.City,
-        title: 'City'
-    },
-    [PlaceType.State]: {
-        type: PlaceType.State,
-        title: 'State'
-    },
-    [PlaceType.Country]: {
-        type: PlaceType.Country,
-        title: 'Country'
-    },
-}
-
-const searchResultIncludesArray = [
-    PlaceType.City,
-    PlaceType.State,
-    PlaceType.Country
-];
-
-const searchPlaceSectionConfig = {
-    [SearchPlaceSectionType.InputCoordinates]: {
-        type: SearchPlaceSectionType.InputCoordinates,
-        title: 'Input coordinates'
-    },
-    [SearchPlaceSectionType.PlaceDetails]: {
-        type: SearchPlaceSectionType.PlaceDetails,
-        title: 'Place details'
-    },
-    [SearchPlaceSectionType.CountryDetails]: {
-        type: SearchPlaceSectionType.CountryDetails,
-        title: 'Country details'
-    },
-    [SearchPlaceSectionType.TimeZoneDetails]: {
-        type: SearchPlaceSectionType.TimeZoneDetails,
-        title: 'TimeZone details'
-    },
-}
-
-const searchPlaceSectionMasterArray = [
-    SearchPlaceSectionType.InputCoordinates,
-    SearchPlaceSectionType.PlaceDetails,
-    SearchPlaceSectionType.CountryDetails,
-    SearchPlaceSectionType.TimeZoneDetails
-];
-
-
-const SettingSectionView = (props) => {
-
-    const {
-        title,
-        children
-    } = props;
-
-    return (
-        <Flex
-            flexDirection={'column'}
-            flex={1}
-            marginBottom={1}>
-            <Box bg={'blue.500'}
-                width={'100%'}
-                paddingY={2}
-                paddingX={6}>
-                <Text
-                    fontSize={'md'}
-                    fontWeight={'semibold'}
-                    color={'white'}>{`${title}`}</Text>
-            </Box>
-            {children}
-        </Flex>
-    )
-}
 
 const AboutApp = forwardRef((props, ref) => {
 
@@ -140,11 +67,7 @@ const AboutApp = forwardRef((props, ref) => {
     } = props;
 
     const [state, setState] = useState({
-        searchPlaceFrom: [],
-        searchPlaceSectionArray: [],
-        searchResultIncludesArray: searchResultIncludesArray,
-        searchPlaceSectionMasterArray: searchPlaceSectionMasterArray
-        // ...userPref?.appSettings ?? {}
+
     });
 
     const updateState = (data) =>
@@ -157,7 +80,6 @@ const AboutApp = forwardRef((props, ref) => {
     /*  Life-cycles Methods */
 
     useEffect(() => {
-        preLoadSettings();
         return () => {
 
         };
@@ -176,102 +98,14 @@ const AboutApp = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         openModal: () => {
             onOpen();
-            preLoadSettings();
         }
     }));
 
     /*  Public Interface Methods */
 
-    const preLoadSettings = () => {
-        let appSettingObj = Object.assign({}, userPref?.appSettings ?? {});
-        updateState({
-            ...appSettingObj
-        });
-    }
-
-    const getUpdatedSettings = () => {
-        let appSettingObj = {
-            coordinateFormat: state?.coordinateFormat.slice(),
-            searchPlaceFrom: state?.searchPlaceFrom.slice(),
-            searchPlaceSectionArray: state?.searchPlaceSectionArray.slice()
-        };
-
-        return appSettingObj;
-    }
-
-    const getDisabledPlaceSearchOption = (type) => {
-        let searchPlaceFromArray = state?.searchPlaceFrom ?? [];
-        return searchPlaceFromArray.includes(type) &&
-            searchPlaceFromArray.length === 1;
-    }
-
-    const getDisabledSearchPlaceSectionOption = (type) => {
-        let searchPlaceSectionArray = state?.searchPlaceSectionArray ?? [];
-        return searchPlaceSectionArray.includes(type) &&
-            searchPlaceSectionArray.length === 1;
-    }
 
     /*  UI Events Methods   */
 
-    const onChangeCoordinateFormat = (value) => {
-        updateState({
-            coordinateFormat: value
-        });
-    }
-
-    const onChangeSearchResultIncludes = (value, type) => {
-        let searchPlaceFromArray = (state?.searchPlaceFrom ?? []).slice();
-
-        if (value) {
-            searchPlaceFromArray.push(type);
-
-        } else {
-            searchPlaceFromArray = lodash.remove(searchPlaceFromArray, (item) => {
-                return item !== type
-            });
-        }
-
-        updateState({
-            searchPlaceFrom: searchPlaceFromArray
-        });
-    }
-
-    const onChangeSearchPlaceSection = (value, type) => {
-        let searchPlaceSectionArray = (state?.searchPlaceSectionArray ?? []).slice();
-
-        if (value) {
-            searchPlaceSectionArray.push(type);
-
-        } else {
-            searchPlaceSectionArray = lodash.remove(searchPlaceSectionArray, (item) => {
-                return item !== type
-            });
-        }
-
-        updateState({
-            searchPlaceSectionArray: searchPlaceSectionArray
-        });
-    }
-
-    const onPressSave = () => {
-        onClose();
-
-        let appSettingObj = getUpdatedSettings();
-
-        props.setUserPref({
-            ...userPref,
-            appSettings: appSettingObj
-        });
-
-        toast({
-            title: 'Settings saved.',
-            // description: "We've created your account for you.",
-            // status: 'success',
-            position: 'top',
-            duration: 2000,
-            isClosable: false,
-        })
-    }
 
     /*  Server Request Methods  */
 
@@ -281,119 +115,16 @@ const AboutApp = forwardRef((props, ref) => {
 
     /*  Custom-Component sub-render Methods */
 
-    const renderGeneralSettings = () => {
+    const renderMasterAboutAppSection = () => {
         return (
-            <SettingSectionView
-                title={'General'}>
-                <Flex
-                    flex={1}
-                    flexDirection={'column'}
-                    p={5}>
-                    <Text
-                        fontSize={'md'}
-                        fontWeight={'semibold'}
-                        mb={4}
-                    >{'Coordinate format : '}</Text>
-                    <RadioGroup
-                        defaultValue={CoordinateFormat.DecDeg}
-                        onChange={onChangeCoordinateFormat}
-                        value={state?.coordinateFormat}
-                        p={0}>
-                        <Stack direction='column' spacing={[1, 5]}>
-                            <Radio value={CoordinateFormat.DecDeg}>{'Decimal Degrees (DD)'}</Radio>
-                            <Radio value={CoordinateFormat.DegMinSec}>{'Degrees, Minutes & Seconds (DMS)'}</Radio>
-                            <Radio value={CoordinateFormat.DegDecMin}>{'Degrees & Decimal Minutes (DMM)'}</Radio>
-                        </Stack>
-                    </RadioGroup>
-                </Flex>
-            </SettingSectionView>
-        )
-    };
+            <Flex>
 
-
-
-    const renderSearchSettings = () => {
-        return (
-            <SettingSectionView
-                title={'Search'}>
-                <Flex
-                    flex={1}
-                    flexDirection={'column'}
-                    p={5}>
-                    <Text
-                        fontSize={'md'}
-                        fontWeight={'semibold'}
-                        mb={4}
-                    >{'Search result includes : '}</Text>
-                    <Stack
-                        spacing={[1, 5]}
-                        direction={['column', 'row']}>
-                        {state?.searchResultIncludesArray.map((item, index) => {
-
-                            let searchResultIncludesObj = searchResultIncludesConfig[item];
-                            let type = searchResultIncludesObj?.type;
-
-                            return (
-                                <Checkbox
-                                    key={`searchFrom-${index}`}
-                                    size='md'
-                                    disabled={getDisabledPlaceSearchOption(type)}
-                                    onChange={(event) => {
-                                        onChangeSearchResultIncludes(event?.target?.checked, type)
-                                    }}
-                                    isChecked={state?.searchPlaceFrom?.includes(type)}>
-                                    {`${searchResultIncludesObj?.title}`}
-                                </Checkbox>
-                            )
-                        })}
-                    </Stack>
-                    <Divider
-                        marginY={5} />
-                    <Text
-                        fontSize={'md'}
-                        fontWeight={'semibold'}
-                        mb={4}
-                    >{'Show sections : '}</Text>
-                    <Stack spacing={[1, 5]} direction={['column']}>
-                        {state?.searchPlaceSectionMasterArray.map((item, index) => {
-
-                            let searchPlaceSectionObj = searchPlaceSectionConfig[item];
-                            let type = searchPlaceSectionObj?.type;
-
-                            return (
-                                <Checkbox
-                                    key={`searchSection-${index}`}
-                                    size='md'
-                                    disabled={getDisabledSearchPlaceSectionOption(type)}
-                                    onChange={(event) => {
-                                        onChangeSearchPlaceSection(event?.target?.checked, type)
-                                    }}
-                                    isChecked={state?.searchPlaceSectionArray?.includes(type)}>
-                                    {`${searchPlaceSectionObj?.title}`}
-                                </Checkbox>
-                            )
-                        })}
-                    </Stack>
-                </Flex>
-            </SettingSectionView>
-        )
-    };
-
-    const renderMasterSettingSection = () => {
-        return (
-            <Flex
-                // flex={1}
-                flexDirection={'column'}
-                overflowX={'hidden'}
-                maxHeight={'60vh'}
-                overflowY={'auto'}
-            // overflowY={'scroll'}
-            >
-                {renderGeneralSettings()}
-                {renderSearchSettings()}
             </Flex>
         )
-    }
+    };
+
+
+
 
     const renderMasterContainer = () => {
         return (
@@ -405,8 +136,7 @@ const AboutApp = forwardRef((props, ref) => {
                     size={'lg'}
                     isCentered
                     overflow={'hidden'}
-                    motionPreset={'slideInBottom'}
-                >
+                    motionPreset={'slideInBottom'}>
                     {/* <ModalOverlay /> */}
                     <ModalOverlay
                         bg='blackAlpha.600'
@@ -415,28 +145,28 @@ const AboutApp = forwardRef((props, ref) => {
                     <ModalContent
                         overflow={'hidden'}
                     >
-                        <ModalHeader>Settings</ModalHeader>
+                        <ModalHeader>About App</ModalHeader>
                         <ModalCloseButton />
                         <Divider />
                         <ModalBody
                             m={0}
                             p={0}
                         >
-                            {renderMasterSettingSection()}
+                            {renderMasterAboutAppSection()}
                         </ModalBody>
                         <Divider />
                         <ModalFooter>
                             <Flex
                                 flex={1}
                                 justify={'flex-end'}>
-                                <Button
+                                {/* <Button
                                     colorScheme='blue'
                                     mr={5}
                                     onClick={onClose}>
                                     Cancel
-                                </Button>
+                                </Button> */}
                                 <Button
-                                    onClick={onPressSave}>Save</Button>
+                                    onClick={onClose}>OK</Button>
                             </Flex>
                         </ModalFooter>
                     </ModalContent>

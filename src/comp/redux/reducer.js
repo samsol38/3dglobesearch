@@ -29,9 +29,11 @@ const initial = {
                 SearchPlaceSectionType.InputCoordinates,
                 SearchPlaceSectionType.PlaceDetails,
                 SearchPlaceSectionType.CountryDetails,
-                SearchPlaceSectionType.TimeZoneDetails
+                SearchPlaceSectionType.TimeZoneDetails,
+                SearchPlaceSectionType.FavouritePlaces
             ]
-        }
+        },
+        favPlaceArray: []
     },
 };
 

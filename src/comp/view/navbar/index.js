@@ -29,6 +29,11 @@ import {
     FaGlobeAfrica
 } from "react-icons/fa";
 
+import {
+    RiTeamFill
+} from "react-icons/ri";
+
+
 // import {
 //     FaGlobeAfrica
 // } from "react-icons/bs";
@@ -39,6 +44,7 @@ import {
 
 import DrawerView from '../drawer';
 import SettingsView from '../settings';
+import AboutApp from '../aboutapp';
 
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
@@ -67,6 +73,7 @@ const NavBarView = (props) => {
 
     const btnRef = useRef();
     const settingsRef = createRef();
+    const aboutAppRef = createRef();
 
     /*  Life-cycles Methods */
 
@@ -85,6 +92,13 @@ const NavBarView = (props) => {
     /*  Public Interface Methods */
 
     /*  UI Events Methods   */
+
+    const onPressAboutApp = () => {
+
+        // console.log(settingsRef.current)
+        aboutAppRef.current &&
+            aboutAppRef.current.openModal();
+    }
 
     const onPressSettings = () => {
 
@@ -162,6 +176,12 @@ const NavBarView = (props) => {
                         /> */}
                         <IconButton
                             ms={3}
+                            variant='link'
+                            icon={<RiTeamFill
+                                boxSize={'20px'} />}
+                            onClick={onPressAboutApp} />
+                        <IconButton
+                            ms={3}
                             me={1}
                             variant='link'
                             icon={<SettingsIcon
@@ -175,6 +195,9 @@ const NavBarView = (props) => {
                     onClose={onClose} />
                 <SettingsView
                     ref={settingsRef}
+                />
+                <AboutApp
+                    ref={aboutAppRef}
                 />
             </>
         )

@@ -31,6 +31,8 @@ import {
     Td,
     TableCaption,
     TableContainer,
+    Spacer,
+    Icon
 } from "@chakra-ui/react"
 
 import {
@@ -39,6 +41,18 @@ import {
     SunIcon,
     InfoIcon
 } from '@chakra-ui/icons'
+
+import {
+    BsFillStarFill,
+    BsStar
+} from 'react-icons/bs';
+
+import {
+    MdSettings,
+    MdCheckCircle,
+    MdLocationPin,
+    MdSearch
+} from 'react-icons/md';
 
 import {
     connect
@@ -62,6 +76,7 @@ import CoordinateInputView from './coordinateInput';
 
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
+import AppManager from '../../utils/AppManager';
 
 import PhoneNumArray from '../../data/info/phone-num.json';
 import PostalCodeArray from '../../data/info/postal-codes.json';
@@ -156,7 +171,9 @@ const PlaceInfoView = (props) => {
         placeDetailsObj: null,
         countryDetailsObj: null,
         timeZoneArray: [],
-        defaultIndex: [0]
+        defaultIndex: [0],
+        favPlaceArray: userPref?.favPlaceArray ?? [],
+        favPlaceDisplayArray: []
     });
 
     const updateState = (data) =>
@@ -205,24 +222,51 @@ const PlaceInfoView = (props) => {
             [SearchPlaceSectionType.InputCoordinates,
             SearchPlaceSectionType.PlaceDetails,
             SearchPlaceSectionType.CountryDetails,
-            SearchPlaceSectionType.TimeZoneDetails];
+            SearchPlaceSectionType.TimeZoneDetails,
+            SearchPlaceSectionType.FavouritePlaces];
 
         return searchPlaceSectionArray.includes(type);
     }
 
-    const showInfo = () => {
+    const showInfo = async () => {
         // console.log(placeItem)
+        await showPlaceInfo();
+        await showFavPlaces();
+    }
 
-        if (!lodash.isNil(placeItem)) {
-            getPlaceDetails();
-        } else {
-            updateState({
-                placeDetailsObj: null,
-                countryDetailsObj: null,
-                timeZoneArray: [],
-                defaultIndex: [0]
+    const showPlaceInfo = async () => {
+        return new Promise(async (resolve, reject) => {
+            if (!lodash.isNil(placeItem)) {
+                getPlaceDetails();
+            } else {
+                await updateState({
+                    placeDetailsObj: null,
+                    countryDetailsObj: null,
+                    timeZoneArray: [],
+                    defaultIndex: [0]
+                });
+            }
+
+            resolve();
+        });
+    }
+
+    const showFavPlaces = async () => {
+        return new Promise(async (resolve, reject) => {
+            let favPlaceArray = userPref?.favPlaceArray ?? [];
+            let favPlaceDisplayArray = [];
+            favPlaceArray.forEach((placeObj, index) => {
+                let currentPlaceItem = getPlaceDetailsFromPlaceItem(placeObj);
+                favPlaceDisplayArray.push(currentPlaceItem);
             });
-        }
+
+            await updateState({
+                favPlaceArray: favPlaceArray,
+                favPlaceDisplayArray: favPlaceDisplayArray
+            });
+
+            resolve();
+        });
     }
 
     const getLatLongInFormat = (inputCoordinate) => {
@@ -461,6 +505,162 @@ const PlaceInfoView = (props) => {
         });
     }
 
+
+    const getPlaceDetailsFromPlaceItem = (placeItemObj) => {
+        let currentPlaceItem = Object.assign({}, placeItemObj);
+
+        let placeType = currentPlaceItem?.type;
+        let placeConfigObj = Object.assign({}, MasterPlaceConfig[currentPlaceItem?.type]);
+        let placeDetailsObj = {};
+
+
+        let inputCoordinate = {
+            latitude: currentPlaceItem?.latitude,
+            longitude: currentPlaceItem?.longitude
+        };
+
+        let outputCoordinate = getLatLongInFormat(inputCoordinate);
+
+        currentPlaceItem = {
+            ...currentPlaceItem,
+            ...outputCoordinate
+        };
+
+        switch (placeType) {
+            case PlaceType.Country: {
+
+                placeDetailsObj = {
+                    name: {
+                        type: 'name',
+                        title: 'Name',
+                        value: currentPlaceItem?.name,
+                    },
+                    placeType: {
+                        type: 'placeType',
+                        title: 'Place Type',
+                        value: 'Country'
+                    },
+                    latitude: {
+                        type: 'latitude',
+                        title: 'Latitude',
+                        value: currentPlaceItem?.latitude
+                    },
+                    longitude: {
+                        type: 'longitude',
+                        title: 'Longitude',
+                        value: currentPlaceItem?.longitude
+                    }
+                }
+
+                break;
+            }
+
+            case PlaceType.State: {
+
+                placeDetailsObj = {
+                    name: {
+                        type: 'name',
+                        title: 'Name',
+                        value: currentPlaceItem?.name,
+                    },
+                    placeType: {
+                        type: 'placeType',
+                        title: 'Place Type',
+                        value: 'State'
+                    },
+                    address: {
+                        type: 'address',
+                        title: 'Address',
+                        value: currentPlaceItem?.address,
+                    },
+                    latitude: {
+                        type: 'latitude',
+                        title: 'Place Latitude',
+                        value: currentPlaceItem?.latitude
+                    },
+                    longitude: {
+                        type: 'longitude',
+                        title: 'Place Longitude',
+                        value: currentPlaceItem?.longitude
+                    }
+                }
+
+                break;
+            }
+
+            case PlaceType.City: {
+
+                placeDetailsObj = {
+                    name: {
+                        type: 'name',
+                        title: 'Name',
+                        value: currentPlaceItem?.name,
+                    },
+                    placeType: {
+                        type: 'placeType',
+                        title: 'Place Type',
+                        value: 'City'
+                    },
+                    address: {
+                        type: 'address',
+                        title: 'Address',
+                        value: currentPlaceItem?.address,
+                    },
+                    latitude: {
+                        type: 'latitude',
+                        title: 'Latitude',
+                        value: currentPlaceItem?.latitude
+                    },
+                    longitude: {
+                        type: 'longitude',
+                        title: 'Longitude',
+                        value: currentPlaceItem?.longitude
+                    },
+                }
+
+                break;
+            }
+        }
+
+        let timezoneByPlace = tzlookup(currentPlaceItem?.latitude, currentPlaceItem?.longitude);
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            timeZone: {
+                type: 'timeZone',
+                title: 'TimeZone',
+                value: timezoneByPlace
+            }
+        }
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            currentDate: {
+                type: 'currentDate',
+                title: 'Current Date',
+                format: 'Do MMM, YYYY, ddd',
+                ticking: false,
+                blinking: false,
+                value: timezoneByPlace
+            }
+        }
+
+        placeDetailsObj = {
+            ...placeDetailsObj,
+            currentTime: {
+                type: 'currentTime',
+                title: 'Current Time',
+                format: 'hh:mm:ss a',
+                // format: 'hh:mm a',
+                ticking: true,
+                blinking: false,
+                value: timezoneByPlace
+            }
+        }
+
+        return placeDetailsObj;
+    }
+
     const setCountryDetails = (countryItem) => {
 
         let inputCoordinate = {
@@ -577,7 +777,6 @@ const PlaceInfoView = (props) => {
                 }
             }
 
-
             let zoneName = timeZoneObj['zoneName']['value'];
 
             timeZoneObj = {
@@ -677,6 +876,23 @@ const PlaceInfoView = (props) => {
             selectedPlaceItem: null,
             selectedInputCoordinate: updatedCoordinates
         });
+    }
+
+    const onPressMakeUnFavItem = async (favPlaceObj, index) => {
+        let favPlaceArray = (userPref?.favPlaceArray ?? []).slice();
+        favPlaceArray.splice(index, 1);
+
+        await props.setUserPref({
+            ...userPref,
+            favPlaceArray: favPlaceArray.slice()
+        });
+    }
+
+    const onPressShowFavItem = async (favPlaceObj, index) => {
+        let favPlaceArray = userPref?.favPlaceArray ?? [];
+        let searchFavPlaceItem = favPlaceArray[index];
+
+        AppManager.getInstance().showFavPlaceItem(searchFavPlaceItem);
     }
 
     /*  Server Request Methods  */
@@ -902,6 +1118,50 @@ const PlaceInfoView = (props) => {
         )
     }
 
+    const renderFavPlaceProperty = (propertyItem, index) => {
+
+        if (lodash.isNil(propertyItem?.value)) {
+            return;
+        }
+
+        return (
+            <>
+                <Flex
+                    key={`FavPlace-${propertyItem?.value}-${index}`}
+                    flexDirection='row'
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
+                    mb={2}>
+                    <Text fontSize={'sm'}>{`${propertyItem?.title}`}</Text>
+                    <Flex
+                        justify={'center'}
+                        alignItems={'center'}
+                        // height={1}
+                        flexGrow={1}
+                        marginX={'5px'}
+                    ><Divider zIndex={0} /></Flex>
+                    {!lodash.isNil(propertyItem?.type) &&
+                        ['currentDateV1',
+                            'currentDateV2',
+                            'currentDate',
+                            'currentTime'].includes(propertyItem?.type) ?
+                        <Code
+                            fontSize={'sm'}
+                            textAlign={'right'}
+                            colorScheme='purple'>
+                            <Clock format={propertyItem?.format}
+                                ticking={propertyItem?.ticking}
+                                blinking={propertyItem?.blinking}
+                                timezone={propertyItem?.value} /></Code> :
+                        <Code
+                            fontSize={'sm'}
+                            textAlign={'right'}
+                            colorScheme='linkedin'>{`${propertyItem?.value}`.trim()}</Code>}
+                </Flex>
+            </>
+        )
+    }
+
     const renderPlaceInfo = () => {
         return (
             <Accordion
@@ -1011,6 +1271,74 @@ const PlaceInfoView = (props) => {
                                 </AccordionPanel>
                             </AccordionItem>}
                     </>}
+                {isSearchPlaceSectionWithinSettings(SearchPlaceSectionType.FavouritePlaces) &&
+                    (state?.favPlaceDisplayArray ?? []).length > 0 &&
+                    <AccordionItem
+                        key={4}>
+                        <AccordionButton
+                            bg={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
+                        >
+                            <Box width={'100%'} fontSize={'md'}
+                                fontWeight={'medium'} textAlign='left'>
+                                {`Favourite Places - (${state?.favPlaceDisplayArray.length})`}
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                        <AccordionPanel>
+                            <Box>
+                                {(state?.favPlaceDisplayArray ?? []).map((favPlaceObj, index) => {
+                                    return (
+                                        <Box
+                                            paddingY={1}
+                                            key={`favPlace-${index}`}>
+                                            <Flex
+                                                alignItems={'center'}
+                                                justifyContent={'center'}
+                                                flexDirection={'row'}>
+                                                <Text
+                                                    fontWeight={'medium'}
+                                                    align={'left'}
+                                                    fontSize={'md'}>{`${favPlaceObj?.name?.value}`}</Text>
+                                                <Spacer />
+                                                <IconButton
+                                                    variant={'solid'}
+                                                    me={2}
+                                                    onClick={() => {
+                                                        onPressMakeUnFavItem(favPlaceObj, index);
+                                                    }}
+                                                    icon={<Icon
+                                                        alignSelf={'center'}
+                                                        as={BsFillStarFill}
+                                                        boxSize={'15px'} />} />
+                                                <IconButton
+                                                    variant={'solid'}
+                                                    onClick={() => {
+                                                        onPressShowFavItem(favPlaceObj, index);
+                                                    }}
+                                                    icon={<Icon
+                                                        alignSelf={'center'}
+                                                        as={MdLocationPin}
+                                                        boxSize={'15px'} />} />
+                                            </Flex>
+                                            <Box
+                                                mt={2}>
+                                                {Object.keys(favPlaceObj).map((item, placeIndex) => {
+                                                    if (item === 'name') {
+                                                        return null;
+                                                    }
+
+                                                    return renderFavPlaceProperty(favPlaceObj[item], placeIndex)
+                                                })}
+                                            </Box>
+                                            {index < (state?.favPlaceDisplayArray ?? []).length - 1 &&
+                                                <Divider
+                                                    pt={2}
+                                                    mb={2} />}
+                                        </Box>);
+                                })}
+                            </Box>
+                        </AccordionPanel>
+                    </AccordionItem>}
             </Accordion>
         )
     }

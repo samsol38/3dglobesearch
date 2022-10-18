@@ -24,6 +24,7 @@ import {
     Icon,
     FormControl,
     Divider,
+    Spacer,
 } from "@chakra-ui/react"
 
 import {
@@ -43,6 +44,11 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 
 import {
+    BsFillStarFill,
+    BsStar
+} from 'react-icons/bs';
+
+import {
     MdSettings,
     MdCheckCircle,
     MdLocationPin,
@@ -60,6 +66,7 @@ import PlaceInfoView from './placeInfo';
 
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
+import AppManager from '../../utils/AppManager';
 
 import MasterWorldArray from '../../data/info/countries+states+cities.json';
 
@@ -67,7 +74,8 @@ const {
     MasterDrawerMenuType,
     MasterDrawerMenuConfig,
     MasterDrawerMenuArray,
-    PlaceType
+    PlaceType,
+    AppNotifKey
 } = Constants;
 
 const SearchPlaceView = (props) => {
@@ -81,10 +89,12 @@ const SearchPlaceView = (props) => {
 
     const [state, setState] = useState({
         placeName: '',
+
         searchResultArray: [],
         placeItem: null,
         placeholder: 'Searching...',
-        isSearching: false
+        isSearching: false,
+        favPlaceArray: userPref?.favPlaceArray ?? []
     });
 
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -98,7 +108,9 @@ const SearchPlaceView = (props) => {
 
     useEffect(() => {
         // console.log("MasterWorldArray: ", MasterWorldArray[0])
+        addEventListener();
         return () => {
+            removeEventListener();
         };
     }, []);
 
@@ -127,6 +139,18 @@ const SearchPlaceView = (props) => {
     }, [searchKeyword]);
 
     /*  Public Interface Methods */
+
+    const addEventListener = () => {
+        AppManager.getInstance().addEventListener(AppNotifKey.SHOW_FAV_PLACE, emitOnPressPlaceItem);
+    }
+
+    const removeEventListener = () => {
+        AppManager.getInstance().removeEventListener(AppNotifKey.SHOW_FAV_PLACE, emitOnPressPlaceItem);
+    }
+
+    const emitOnPressPlaceItem = (favPlaceItem) => {
+        onPressPlaceItem(favPlaceItem);
+    }
 
     const closetSort = (array, keyword) => {
         return array.sort((a, b) => {
@@ -444,9 +468,26 @@ const SearchPlaceView = (props) => {
         });
     }
 
-    const onSubmitEvent = (event) => {
-        event.preventDefault();
-        alert('test')
+    const onPressMakeFavItem = async (isFavPlace, favPlaceIndex, placeItem) => {
+        let favPlaceArray = userPref?.favPlaceArray ?? [];
+
+        if (isFavPlace) {
+            if (favPlaceIndex >= 0) {
+                favPlaceArray.splice(favPlaceIndex, 1);
+
+                await props.setUserPref({
+                    ...userPref,
+                    favPlaceArray: favPlaceArray.slice()
+                });
+            }
+        } else {
+            favPlaceArray.push(placeItem);
+
+            await props.setUserPref({
+                ...userPref,
+                favPlaceArray: favPlaceArray.slice()
+            });
+        }
     }
 
     const onClickClearButton = () => {
@@ -526,34 +567,61 @@ const SearchPlaceView = (props) => {
                         marginTop={'2px'}
 
                     >
-                        {(state?.searchResultArray ?? []).map((item, index) => (
-                            <AutoCompleteItem
-                                onClick={() => {
-                                    onPressPlaceItem(item);
-                                }}
-                                key={`option-${index}`}
-                                getValue={(item) => item?.address}
-                                value={item}
-                            >
-                                <Flex
-                                    flexDirection={'column'}
-                                    flex={1}>
+                        {(state?.searchResultArray ?? []).map((item, index) => {
+
+                            let favPlaceArray = userPref?.favPlaceArray ?? [];
+                            favPlaceArray = favPlaceArray.map((favPlaceItem) => favPlaceItem?.address)
+                            let isFavPlace = favPlaceArray.includes(item?.address);
+                            let favPlaceIndex = -1;
+                            if (isFavPlace) {
+                                favPlaceIndex = favPlaceArray.findIndex((favPlaceAddress) =>
+                                    favPlaceAddress === item?.address);
+                            }
+
+                            return (
+                                <AutoCompleteItem
+                                    onClick={() => {
+                                        onPressPlaceItem(item);
+                                    }}
+                                    key={`option-${index}`}
+                                    getValue={(item) => item?.address}
+                                    value={item}>
                                     <Flex
-                                        flexDirection={'row'}>
-                                        <Icon
-                                            alignSelf={'flex-start'}
-                                            justifySelf={'center'}
-                                            as={MdLocationPin}
-                                            boxSize={'15px'}
-                                            me={2}
-                                            mt={1} />
-                                        <Text
-                                            fontSize='md'
-                                        >{`${item.address}`}</Text>
+                                        flexDirection={'column'}
+                                        flex={1}>
+                                        <Flex
+                                            flexDirection={'row'}
+                                            justifyContent={'center'}
+                                            alignItems={'center'}>
+                                            <Icon
+                                                justifySelf={'center'}
+                                                alignSelf={'center'}
+                                                as={MdLocationPin}
+                                                boxSize={'15px'}
+                                                me={3}
+                                            // mt={1}
+                                            />
+                                            <Text
+                                                fontSize='md'
+                                            >{`${item.address}`}</Text>
+                                            <Spacer />
+                                            <IconButton
+                                                variant={'solid'}
+                                                onClick={() => {
+                                                    onPressMakeFavItem(isFavPlace, favPlaceIndex, item);
+                                                }}
+                                                icon={<Icon
+                                                    alignSelf={'center'}
+                                                    as={isFavPlace ?
+                                                        BsFillStarFill :
+                                                        BsStar}
+                                                    boxSize={'15px'} />} />
+                                        </Flex>
                                     </Flex>
-                                </Flex>
-                            </AutoCompleteItem>
-                        ))}
+                                </AutoCompleteItem>
+                            )
+
+                        })}
                     </AutoCompleteList>
                 </AutoComplete >
             </Flex>

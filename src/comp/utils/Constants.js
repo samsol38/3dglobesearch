@@ -12,6 +12,10 @@ import {
     MdOutlinePersonPin
 } from 'react-icons/md';
 
+const AppNotifKey = {
+    SHOW_FAV_PLACE: 'SHOW_FAV_PLACE',
+}
+
 const MasterDrawerMenuType = {
     Search: 1,
     Location: 2,
@@ -85,10 +89,12 @@ const SearchPlaceSectionType = {
     InputCoordinates: 1,
     PlaceDetails: 2,
     CountryDetails: 3,
-    TimeZoneDetails: 4
+    TimeZoneDetails: 4,
+    FavouritePlaces: 5
 }
 
 export default {
+    AppNotifKey,
     MasterDrawerMenuType,
     MasterDrawerMenuConfig,
     MasterDrawerMenuArray,

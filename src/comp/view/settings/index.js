@@ -96,14 +96,18 @@ const searchPlaceSectionConfig = {
         type: SearchPlaceSectionType.TimeZoneDetails,
         title: 'TimeZone details'
     },
+    [SearchPlaceSectionType.FavouritePlaces]: {
+        type: SearchPlaceSectionType.FavouritePlaces,
+        title: 'Favourite places'
+    },
 }
 
 const searchPlaceSectionMasterArray = [
     SearchPlaceSectionType.InputCoordinates,
     SearchPlaceSectionType.PlaceDetails,
     SearchPlaceSectionType.CountryDetails,
-    SearchPlaceSectionType.TimeZoneDetails
-];
+    SearchPlaceSectionType.TimeZoneDetails,
+    SearchPlaceSectionType.FavouritePlaces];
 
 
 const SettingSectionView = (props) => {

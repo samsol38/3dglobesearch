@@ -130,7 +130,27 @@ const MasterGlobeView = (props) => {
 
     const initData = () => {
 
+        clearDomElements();
+
+        let {
+            svg,
+            svgMarker
+        } = globeDataObj.current;
+
+        if (!svg) {
+            updateGlobeData({
+                svg: d3.select(svgRef.current),
+            });
+        }
+
+        if (!svgMarker) {
+            updateGlobeData({
+                svgMarker: d3.select(svgMarkerRef.current),
+            });
+        }
+
         globeDataObj.current = {
+            ...globeDataObj.current,
             scaleFactor: 0.9,
             water: {
                 type: 'Sphere'
@@ -182,8 +202,8 @@ const MasterGlobeView = (props) => {
 
             canvas: d3.select(canvasRef.current),
             canvasOp: d3.select(canvasOpRef.current),
-            svg: d3.select(svgRef.current),
-            svgMarker: d3.select(svgMarkerRef.current),
+            // svg: d3.select(svgRef.current),
+            // svgMarker: d3.select(svgMarkerRef.current),
         };
 
         const {
@@ -245,8 +265,6 @@ const MasterGlobeView = (props) => {
         });
 
         setAngles();
-
-        console.log(width, height)
 
         canvas
             .call(d3.drag()
@@ -318,6 +336,46 @@ const MasterGlobeView = (props) => {
 
     /*  UI Events Methods   */
 
+    const clearDomElements = () => {
+        let {
+            svg,
+            svgMarker,
+            graticuleGroup,
+
+            landGroup,
+            textGroup,
+            markerGroup,
+        } = globeDataObj.current;
+
+        if (svgMarker) {
+            svgMarker.selectAll("#graticule").remove();
+            svgMarker.selectAll("#land").remove();
+            svgMarker.selectAll("#text").remove();
+            svgMarker.selectAll("#image").remove();
+        }
+
+        updateGlobeData({
+            svg: svg,
+            svgMarker: svgMarker,
+
+            graticuleGroup: null,
+            landGroup: null,
+            textGroup: null,
+            markerGroup: null,
+
+            markerArray: [],
+            markerLineArray: [],
+            markerPolygonArray: [],
+
+            selectedMarkerID: null,
+            selectedCounytryID: null,
+            userCountryID: null,
+            canvas: null,
+            canvasOp: null
+        });
+
+    }
+
     const initDomElements = () => {
 
         let {
@@ -375,10 +433,19 @@ const MasterGlobeView = (props) => {
             svgMarker: svgMarker
         });
 
+        svgMarker.selectAll('#maskPath').remove();
+
+        let mask = svgMarker.append("clipPath")
+        mask.attr("id", 'maskPath')
+        mask.html(`
+            <rect width="${width}" height="${height}" x="0" y="0" />
+        `);
+
         if (!graticuleGroup) {
 
             graticuleGroup = svg.append("g")
                 .attr("id", 'graticule')
+                .attr("clip-path", "url(#maskPath)");
 
             graticuleGroup.append("path")
                 .datum(graticule)
@@ -432,20 +499,13 @@ const MasterGlobeView = (props) => {
         `)
 
             landGroup = svg.append("g")
-                .attr("id", 'land');
+                .attr("id", 'land')
+                .attr("clip-path", "url(#maskPath)");
 
             updateGlobeData({
                 landGroup: landGroup
             });
         }
-
-        svgMarker.selectAll('#maskPath').remove();
-
-        let mask = svgMarker.append("clipPath")
-        mask.attr("id", 'maskPath')
-        mask.html(`
-            <rect width="${width}" height="${height}" x="0" y="0" />
-        `);
 
         if (!textGroup) {
 
@@ -508,7 +568,6 @@ const MasterGlobeView = (props) => {
         });
 
         if (!markerGroup) {
-
             markerGroup = svgMarker.append("g")
                 .attr("id", 'marker');
 
@@ -822,6 +881,35 @@ const MasterGlobeView = (props) => {
         if (scaleFactor >= 2) {
             renderText();
         }
+    }
+
+    const renderCanvasText = (obj, color) => {
+
+        let {
+            projection,
+            graticule,
+            context,
+            contextOp
+        } = elementRefObj.current;
+
+        let {
+            path,
+            pathOp,
+            tempPath
+        } = pathRefObj.current;
+
+        context.font = '48px serif';
+        context.fillText('Hello world', 10, 50);
+
+        // context.beginPath()
+        // path(obj)
+        // context.shadowBlur = 0;
+        // context.shadowOffsetX = 0;
+        // context.shadowOffsetY = 0;
+        // context.lineWidth = 0.6;
+        // context.setLineDash([4, 2])
+        // context.strokeStyle = color;
+        // context.stroke()
     }
 
     const renderMarker = () => {
