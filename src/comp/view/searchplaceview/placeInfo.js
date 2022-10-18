@@ -1300,25 +1300,29 @@ const PlaceInfoView = (props) => {
                                                     align={'left'}
                                                     fontSize={'md'}>{`${favPlaceObj?.name?.value}`}</Text>
                                                 <Spacer />
-                                                <IconButton
-                                                    variant={'solid'}
-                                                    me={2}
-                                                    onClick={() => {
-                                                        onPressMakeUnFavItem(favPlaceObj, index);
-                                                    }}
-                                                    icon={<Icon
-                                                        alignSelf={'center'}
-                                                        as={BsFillStarFill}
-                                                        boxSize={'15px'} />} />
-                                                <IconButton
-                                                    variant={'solid'}
-                                                    onClick={() => {
-                                                        onPressShowFavItem(favPlaceObj, index);
-                                                    }}
-                                                    icon={<Icon
-                                                        alignSelf={'center'}
-                                                        as={MdLocationPin}
-                                                        boxSize={'15px'} />} />
+                                                <Tooltip label='Remove place from favourite places'>
+                                                    <IconButton
+                                                        variant={'solid'}
+                                                        me={2}
+                                                        onClick={() => {
+                                                            onPressMakeUnFavItem(favPlaceObj, index);
+                                                        }}
+                                                        icon={<Icon
+                                                            alignSelf={'center'}
+                                                            as={BsFillStarFill}
+                                                            boxSize={'15px'} />} />
+                                                </Tooltip>
+                                                <Tooltip label='Show place in 3D Globe'>
+                                                    <IconButton
+                                                        variant={'solid'}
+                                                        onClick={() => {
+                                                            onPressShowFavItem(favPlaceObj, index);
+                                                        }}
+                                                        icon={<Icon
+                                                            alignSelf={'center'}
+                                                            as={MdLocationPin}
+                                                            boxSize={'15px'} />} />
+                                                </Tooltip>
                                             </Flex>
                                             <Box
                                                 mt={2}>

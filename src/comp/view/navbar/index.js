@@ -15,7 +15,8 @@ import {
     Flex,
     Button,
     IconButton,
-    Icon
+    Icon,
+    Tooltip
 } from "@chakra-ui/react"
 
 import {
@@ -160,33 +161,33 @@ const NavBarView = (props) => {
                         </Flex>
                     </Flex>
                     <Flex>
-                        <IconButton
-                            variant='link'
-                            icon={colorMode === 'light' ?
-                                <MoonIcon
-                                    boxSize={'20px'} /> :
-                                <SunIcon
+                        <Tooltip label='Change Theme'>
+                            <IconButton
+                                variant='link'
+                                icon={colorMode === 'light' ?
+                                    <MoonIcon
+                                        boxSize={'20px'} /> :
+                                    <SunIcon
+                                        boxSize={'20px'} />}
+                                onClick={toggleColorMode} />
+                        </Tooltip>
+                        <Tooltip label='About App'>
+                            <IconButton
+                                ms={3}
+                                variant='link'
+                                icon={<RiTeamFill
                                     boxSize={'20px'} />}
-                            onClick={toggleColorMode} />
-                        {/* <IconButton
-                            ms={3}
-                            variant='link'
-                            icon={<SettingsIcon
-                                boxSize={'20px'} />}
-                        /> */}
-                        <IconButton
-                            ms={3}
-                            variant='link'
-                            icon={<RiTeamFill
-                                boxSize={'20px'} />}
-                            onClick={onPressAboutApp} />
-                        <IconButton
-                            ms={3}
-                            me={1}
-                            variant='link'
-                            icon={<SettingsIcon
-                                boxSize={'20px'} />}
-                            onClick={onPressSettings} />
+                                onClick={onPressAboutApp} />
+                        </Tooltip>
+                        <Tooltip label='Settings'>
+                            <IconButton
+                                ms={3}
+                                me={1}
+                                variant='link'
+                                icon={<SettingsIcon
+                                    boxSize={'20px'} />}
+                                onClick={onPressSettings} />
+                        </Tooltip>
                     </Flex>
                 </Flex>
                 <DrawerView
