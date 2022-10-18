@@ -253,10 +253,12 @@ const PlaceInfoView = (props) => {
 
     const showFavPlaces = async () => {
         return new Promise(async (resolve, reject) => {
-            let favPlaceArray = userPref?.favPlaceArray ?? [];
+            let favPlaceArray = (userPref?.favPlaceArray ?? []).slice();
             let favPlaceDisplayArray = [];
+
             favPlaceArray.forEach((placeObj, index) => {
                 let currentPlaceItem = getPlaceDetailsFromPlaceItem(placeObj);
+                currentPlaceItem = Object.assign({}, currentPlaceItem);
                 favPlaceDisplayArray.push(currentPlaceItem);
             });
 
@@ -513,7 +515,6 @@ const PlaceInfoView = (props) => {
         let placeConfigObj = Object.assign({}, MasterPlaceConfig[currentPlaceItem?.type]);
         let placeDetailsObj = {};
 
-
         let inputCoordinate = {
             latitude: currentPlaceItem?.latitude,
             longitude: currentPlaceItem?.longitude
@@ -622,7 +623,7 @@ const PlaceInfoView = (props) => {
             }
         }
 
-        let timezoneByPlace = tzlookup(currentPlaceItem?.latitude, currentPlaceItem?.longitude);
+        let timezoneByPlace = tzlookup(placeItemObj?.latitude, placeItemObj?.longitude);
 
         placeDetailsObj = {
             ...placeDetailsObj,

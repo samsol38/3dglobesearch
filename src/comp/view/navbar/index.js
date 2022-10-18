@@ -27,17 +27,16 @@ import {
 } from '@chakra-ui/icons'
 
 import {
-    FaGlobeAfrica
+    FaGlobeAfrica,
 } from "react-icons/fa";
 
 import {
     RiTeamFill
 } from "react-icons/ri";
 
-
-// import {
-//     FaGlobeAfrica
-// } from "react-icons/bs";
+import {
+    BsFillInfoCircleFill
+} from "react-icons/bs";
 
 import {
     connect
@@ -175,7 +174,7 @@ const NavBarView = (props) => {
                             <IconButton
                                 ms={3}
                                 variant='link'
-                                icon={<RiTeamFill
+                                icon={<BsFillInfoCircleFill
                                     boxSize={'20px'} />}
                                 onClick={onPressAboutApp} />
                         </Tooltip>

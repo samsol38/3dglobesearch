@@ -41,11 +41,13 @@ import {
     Tfoot,
     Tr,
     Th,
+    Code,
     Td,
     TableCaption,
     Link,
     TableContainer,
     Spacer,
+    Icon,
 } from "@chakra-ui/react"
 
 import {
@@ -53,6 +55,15 @@ import {
     MoonIcon,
     SunIcon
 } from '@chakra-ui/icons'
+
+import {
+    FaLinkedin,
+    FaStackOverflow
+} from 'react-icons/fa'
+
+import {
+    AiFillLike
+} from 'react-icons/ai'
 
 import {
     connect
@@ -153,7 +164,7 @@ const AboutApp = forwardRef((props, ref) => {
             version: '5.1.1',
             package: '@choc-ui/chakra-autocomplete',
             npmURL: 'https://www.npmjs.com/package/@choc-ui/chakra-autocomplete',
-            url: 'https://github.com/chakra-ui/chakra-ui#readme'
+            url: 'https://github.com/anubra266/choc-autocomplete#readme'
         },
         d3js: {
             title: 'D3 - Data-Driven Documents',
@@ -274,6 +285,23 @@ const AboutApp = forwardRef((props, ref) => {
 
     /*  Custom-Component sub-render Methods */
 
+    const renderLinkButtonControl = (text, link) => {
+        return (
+            <Link
+                href={`${link}`}
+                passHref
+                target="_blank">
+                <Button
+                    as="a"
+                    variant={'link'}>
+                    <Text
+                        as={'u'}
+                        fontSize={'md'}>{`${text}`}</Text>
+                </Button>
+            </Link>
+        )
+    }
+
     const renderAboutDeveloperSection = () => {
         return (
             <AboutAppSectionView
@@ -286,8 +314,30 @@ const AboutApp = forwardRef((props, ref) => {
                         fontSize={'md'}
                         fontWeight={'semibold'}
                         mb={4}
-                    >{''}</Text>
-
+                    >{'Samir Solanki & all open source library contributors'}</Text>
+                    <Flex
+                        flexDirection={'row'}
+                        mb={2}>
+                        <Icon as={FaLinkedin}
+                            alignSelf={'center'}
+                            boxSize={'20px'} />
+                        <Box
+                            ms={2}
+                            alignContent={'center'}>
+                            {renderLinkButtonControl('https://linkedin.com/in/samir38', 'https://linkedin.com/in/samir38')}
+                        </Box>
+                    </Flex>
+                    <Flex
+                        flexDirection={'row'}>
+                        <Icon as={FaStackOverflow}
+                            alignSelf={'center'}
+                            boxSize={'20px'} />
+                        <Box
+                            ms={2}
+                            alignContent={'center'}>
+                            {renderLinkButtonControl('https://stackoverflow.com/users/447161/samsol', 'https://stackoverflow.com/users/447161/samsol')}
+                        </Box>
+                    </Flex>
                 </Flex>
             </AboutAppSectionView>
         )
@@ -301,6 +351,17 @@ const AboutApp = forwardRef((props, ref) => {
                     flex={1}
                     flexDirection={'column'}
                     p={5}>
+                    <Flex
+                        direction={'row'}
+                        justifyContent={'center'}
+                        alignItems={'center'}
+                        paddingTop={2}
+                        paddingBottom={8}>
+                        <Code fontSize={'md'} me={3} colorScheme={'linkedin'}>{'Thanks to all open source library contributors !!'}</Code>
+                        <Icon as={AiFillLike}
+                            alignSelf={'center'}
+                            boxSize={'20px'} />
+                    </Flex>
                     <TableContainer>
                         <Table size='sm'>
                             <Thead>
@@ -315,10 +376,11 @@ const AboutApp = forwardRef((props, ref) => {
                                     return (
                                         <Tr
                                             key={`libDesc-${index}`}>
-                                            <Td>
-                                                <Text alignSelf={'center'} fontSize={'md'}>{`${libObj?.title}`}</Text>
+                                            <Td
+                                                height={'100%'}>
+                                                <Code fontSize={'md'} colorScheme={'linkedin'}>{`${libObj?.title}`}</Code>
                                             </Td>
-                                            <Td>
+                                            <Td height={'100%'}>
                                                 <Stack
                                                     spacing={[1, 5]}
                                                     direction={['column']}
@@ -357,10 +419,10 @@ const AboutApp = forwardRef((props, ref) => {
                                     )
                                 })}
                                 <Tr>
-                                    <Td>
-                                        <Text verticalAlign={'center'} fontSize={'md'}>{`Countries States Cities Database`}</Text>
+                                    <Td height={'100%'}>
+                                        <Code fontSize={'md'} colorScheme={'linkedin'}>{`Countries States Cities Database`}</Code>
                                     </Td>
-                                    <Td>
+                                    <Td height={'100%'}>
                                         <Stack
                                             spacing={[1, 5]}
                                             direction={['column']}
