@@ -12,6 +12,16 @@ import {
     MdOutlinePersonPin
 } from 'react-icons/md';
 
+const FirebaseConfig = {
+    apiKey: "AIzaSyDiifqzOuivaprBq5L4Us0DYqKqiYUaDdg",
+    authDomain: "webapps-b7f67.firebaseapp.com",
+    projectId: "webapps-b7f67",
+    storageBucket: "webapps-b7f67.appspot.com",
+    messagingSenderId: "565126622407",
+    appId: "1:565126622407:web:1e61e6c70044f5cd3f22e2",
+    measurementId: "G-QLG1WWSVGL"
+};
+
 const AppNotifKey = {
     SHOW_FAV_PLACE: 'SHOW_FAV_PLACE',
 }
@@ -94,6 +104,7 @@ const SearchPlaceSectionType = {
 }
 
 export default {
+    FirebaseConfig,
     AppNotifKey,
     MasterDrawerMenuType,
     MasterDrawerMenuConfig,

@@ -16,8 +16,19 @@ import {
 import {
     NavBarView,
     DrawerView,
-    MasterContainer
+    MasterContainer,
+    Constants
 } from './comp';
+
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const {
+    FirebaseConfig
+} = Constants;
+
+const app = initializeApp(FirebaseConfig);
+const analytics = getAnalytics(app);
 
 const App = (props) => {
 

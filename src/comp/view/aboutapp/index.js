@@ -199,7 +199,7 @@ const AboutApp = forwardRef((props, ref) => {
             version: '4.17.21',
             package: 'lodash',
             npmURL: 'https://www.npmjs.com/package/lodash',
-            url: 'https://github.com/chakra-ui/chakra-ui#readme'
+            url: 'https://lodash.com/'
         },
         reactIcons: {
             title: 'React Icons',

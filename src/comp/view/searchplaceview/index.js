@@ -546,7 +546,7 @@ const SearchPlaceView = (props) => {
                         />
                         <AutoCompleteInput
                             variant="filled"
-                            placeholder='Search place name'
+                            placeholder='Enter place name to search'
                             value={searchKeyword}
                             onChange={handleChange} />
                         <InputRightElement
