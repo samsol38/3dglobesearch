@@ -67,7 +67,8 @@ import Clock from 'react-live-clock';
 import {
     degToDMS,
     degToDMM,
-    toDegreesMinutesAndSecondsV2,
+    toDegreesMinutesAndSecondsV2Latitude,
+    toDegreesMinutesAndSecondsV2Longitude,
     toDegreesMinutesAndSecondsLatitude,
     toDegreesMinutesAndSecondsLongitude
 } from '../../utils';
@@ -992,9 +993,9 @@ const PlaceInfoView = (props) => {
                                 placement='top'
                                 label={'Degrees & Decimal Minutes'}>DDM</Tooltip></Td>
                             <Td textAlign='center'
-                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2(coordinate?.latitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2Latitude(coordinate?.latitude ?? 0)}`}</Td>
                             <Td textAlign='center'
-                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2(coordinate?.longitude ?? 0)}`}</Td>
+                                fontSize={latLngValueSize}>{`${toDegreesMinutesAndSecondsV2Longitude(coordinate?.longitude ?? 0)}`}</Td>
                         </Tr>
                     </Tbody>
                 </Table>

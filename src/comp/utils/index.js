@@ -16,16 +16,6 @@ const toDegreesMinutesAndSeconds = (coordinate) => {
     return `${degrees}° ${minutes}' ${seconds}"`
 }
 
-const toDegreesMinutesAndSecondsV2 = (coordinate) => {
-    let absolute = Math.abs(coordinate);
-    let degrees = Math.floor(absolute);
-    let minutesNotTruncated = (absolute - degrees) * 60;
-    let minutes = Math.floor(minutesNotTruncated);
-    let seconds = Math.floor((minutesNotTruncated - minutes) * 60);
-
-    return `${degrees} ${minutesNotTruncated.toFixed(4)}`
-}
-
 const degToDMS = (coordinate) => {
 
     let lat = parseFloat(coordinate?.latitude);
@@ -48,8 +38,8 @@ const degToDMM = (coordinate) => {
     let lat = parseFloat(coordinate?.latitude);
     let lng = parseFloat(coordinate?.longitude);
 
-    let latitude = toDegreesMinutesAndSecondsV2(lat);
-    let longitude = toDegreesMinutesAndSecondsV2(lng);
+    let latitude = toDegreesMinutesAndSecondsV2Latitude(lat);
+    let longitude = toDegreesMinutesAndSecondsV2Longitude(lng);
 
     return {
         latitude: `${latitude}`,
@@ -80,11 +70,37 @@ const toDegreesMinutesAndSecondsLongitude = (coordinate) => {
     return `${degrees}° ${minutes}' ${seconds}" ${longitudeCardinal}`
 }
 
+const toDegreesMinutesAndSecondsV2Latitude = (coordinate) => {
+
+    let absolute = Math.abs(coordinate);
+    let degrees = Math.floor(absolute);
+    let minutesNotTruncated = (absolute - degrees) * 60;
+    let minutes = Math.floor(minutesNotTruncated);
+    let seconds = Math.floor((minutesNotTruncated - minutes) * 60);
+
+    let latitudeCardinal = coordinate >= 0 ? "N" : "S";
+    return `${degrees}° ${minutesNotTruncated.toFixed(4)}' ${latitudeCardinal}`
+}
+
+const toDegreesMinutesAndSecondsV2Longitude = (coordinate) => {
+
+    let absolute = Math.abs(coordinate);
+    let degrees = Math.floor(absolute);
+    let minutesNotTruncated = (absolute - degrees) * 60;
+    let minutes = Math.floor(minutesNotTruncated);
+    let seconds = Math.floor((minutesNotTruncated - minutes) * 60);
+
+    let longitudeCardinal = coordinate >= 0 ? "E" : "W";
+    return `${degrees}° ${minutesNotTruncated.toFixed(4)}' ${longitudeCardinal}`
+}
 
 export {
     degToDMS,
     degToDMM,
-    toDegreesMinutesAndSecondsV2,
+
     toDegreesMinutesAndSecondsLatitude,
-    toDegreesMinutesAndSecondsLongitude
+    toDegreesMinutesAndSecondsLongitude,
+
+    toDegreesMinutesAndSecondsV2Latitude,
+    toDegreesMinutesAndSecondsV2Longitude
 }
