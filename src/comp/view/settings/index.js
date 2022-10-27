@@ -393,12 +393,13 @@ const SettingsView = forwardRef((props, ref) => {
                 <Flex
                     flex={1}
                     flexDirection={'row'}
-                    p={5}>
+                    p={5}
+                    pb={2}>
                     <Text
                         fontSize={'md'}
                         fontWeight={'semibold'}
                         mb={4}
-                    >{'Enable Day-Night Mode '}</Text>
+                    >{'Enable Day-Night Mode'}</Text>
                     <Spacer />
                     <Switch
                         isChecked={state?.enableDayNightMode ?? true}
@@ -424,8 +425,8 @@ const SettingsView = forwardRef((props, ref) => {
             // overflowY={'scroll'}
             >
                 {renderGeneralSettings()}
-                {renderSearchSettings()}
                 {renderMapSettings()}
+                {renderSearchSettings()}
             </Flex>
         )
     }
