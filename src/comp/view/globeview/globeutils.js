@@ -112,6 +112,29 @@ const fill = (refObj, obj, color) => {
     context.fill()
 }
 
+const fillCity = (refObj, obj, scaleFactor, radius, color, opacity) => {
+
+    let {
+        context,
+        path
+    } = refObj;
+
+    context.beginPath()
+    // path(obj)
+
+    // context.shadowOffsetX = 3;
+    // context.shadowOffsetY = 3;
+    // context.shadowBlur = 5;
+    // context.shadowColor = '#0008';
+
+    context.arc(obj[0], obj[1], scaleFactor * radius * 2, 0, 360)
+
+    context.fillStyle = color;
+    // context.fillStyle = hexToRgba(color, opacity)
+    context.fill()
+}
+
+
 const stroke = (refObj, obj, color) => {
 
     let {
@@ -169,7 +192,15 @@ const fillPath = (refObj, obj, color) => {
 }
 
 
+const hexToRgba = (hex, opacity = 1) => {
+    hex = hex.toUpperCase();
 
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
 
 export {
     getVisibility,
@@ -178,6 +209,7 @@ export {
     fillLand,
     fillWater,
     fill,
+    fillCity,
 
     stroke,
     strokePath,
