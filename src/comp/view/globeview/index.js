@@ -66,7 +66,8 @@ const {
 const MasterGlobeView = (props) => {
 
     const {
-        userConfig
+        userConfig,
+        userPref
     } = props;
 
     const [state, setState] = useState({
@@ -128,6 +129,17 @@ const MasterGlobeView = (props) => {
         return () => {
         };
     }, []);
+
+
+    useEffect(() => {
+        // console.log('userPref?.appSettings: ', userPref?.appSettings)
+        if (globeDataObj.current.isLoadedMap) {
+            updateGlobeData({
+                enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? false
+            });
+            window.requestAnimationFrame(render);
+        }
+    }, [userPref?.appSettings]);
 
     useEffect(() => {
         let selectedMenuType = state?.selectedMenuType;
@@ -202,6 +214,8 @@ const MasterGlobeView = (props) => {
             dayNightGroup: null,
             cityGroup: null,
 
+            isLoadedMap: false,
+            enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? false,
             isDragStop: true,
             markerArray: [
                 {
@@ -1072,8 +1086,11 @@ const MasterGlobeView = (props) => {
 
             textGroup,
             landGroup,
+            cityGroup,
+            dayNightGroup,
             markerGroup,
-            selectedCounytryID
+            selectedCounytryID,
+            enableDayNightMode
         } = globeDataObj.current;
 
         let {
@@ -1114,12 +1131,18 @@ const MasterGlobeView = (props) => {
         }, countries, '#fff6')
 
 
-        renderCities();
+        // console.log('userPref?.appSettings?.enableDayNightMode: ', userPref?.appSettings?.enableDayNightMode)
 
-        fill({
-            context,
-            path
-        }, water, '#0005');
+        if (enableDayNightMode) {
+            renderCities();
+            fill({
+                context,
+                path
+            }, water, '#0005');
+        } else {
+            cityGroup.selectAll("circle").remove();
+        }
+
 
         // renderSunObj();
 
@@ -1141,7 +1164,8 @@ const MasterGlobeView = (props) => {
         updateGlobeData({
             textGroup: textGroup,
             landGroup: landGroup,
-            markerGroup: markerGroup
+            markerGroup: markerGroup,
+            isLoadedMap: true
         });
 
         // renderText();
@@ -1149,8 +1173,11 @@ const MasterGlobeView = (props) => {
             renderText();
         }
 
-        renderDayNightPath();
-
+        if (enableDayNightMode) {
+            renderDayNightPath();
+        } else {
+            dayNightGroup.selectAll("path").remove();
+        }
     }
 
     const renderCities = () => {

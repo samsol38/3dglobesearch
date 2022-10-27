@@ -230,6 +230,13 @@ const AboutApp = forwardRef((props, ref) => {
             npmURL: 'https://www.npmjs.com/package/react-moment',
             url: 'https://github.com/headzoo/react-moment#readme'
         },
+        sunCalc: {
+            title: 'Sun Calc',
+            version: '1.9.0',
+            package: 'suncalc',
+            npmURL: 'https://www.npmjs.com/package/suncalc',
+            url: 'https://github.com/mourner/suncalc'
+        },
         redux: {
             title: 'Redux',
             version: '4.2.0',

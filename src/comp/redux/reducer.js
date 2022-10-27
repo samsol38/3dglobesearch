@@ -31,7 +31,8 @@ const initial = {
                 SearchPlaceSectionType.CountryDetails,
                 SearchPlaceSectionType.TimeZoneDetails,
                 SearchPlaceSectionType.FavouritePlaces
-            ]
+            ],
+            enableDayNightMode: true
         },
         favPlaceArray: []
     },

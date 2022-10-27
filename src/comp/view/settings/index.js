@@ -34,7 +34,9 @@ import {
     RadioGroup,
     Radio,
     Stack,
-    Checkbox
+    Checkbox,
+    Switch,
+    Spacer
 } from "@chakra-ui/react"
 
 import {
@@ -197,7 +199,8 @@ const SettingsView = forwardRef((props, ref) => {
         let appSettingObj = {
             coordinateFormat: state?.coordinateFormat.slice(),
             searchPlaceFrom: state?.searchPlaceFrom.slice(),
-            searchPlaceSectionArray: state?.searchPlaceSectionArray.slice()
+            searchPlaceSectionArray: state?.searchPlaceSectionArray.slice(),
+            enableDayNightMode: state?.enableDayNightMode ?? false
         };
 
         return appSettingObj;
@@ -257,12 +260,12 @@ const SettingsView = forwardRef((props, ref) => {
         });
     }
 
-    const onPressSave = () => {
+    const onPressSave = async () => {
         onClose();
 
         let appSettingObj = getUpdatedSettings();
 
-        props.setUserPref({
+        await props.setUserPref({
             ...userPref,
             appSettings: appSettingObj
         });
@@ -383,6 +386,33 @@ const SettingsView = forwardRef((props, ref) => {
         )
     };
 
+    const renderMapSettings = () => {
+        return (
+            <SettingSectionView
+                title={'3D Globe Map'}>
+                <Flex
+                    flex={1}
+                    flexDirection={'row'}
+                    p={5}>
+                    <Text
+                        fontSize={'md'}
+                        fontWeight={'semibold'}
+                        mb={4}
+                    >{'Enable Day-Night Mode '}</Text>
+                    <Spacer />
+                    <Switch
+                        isChecked={state?.enableDayNightMode ?? true}
+                        size='lg'
+                        onChange={(event) => {
+                            updateState({
+                                enableDayNightMode: event?.target?.checked
+                            });
+                        }} />
+                </Flex>
+            </SettingSectionView>
+        )
+    };
+
     const renderMasterSettingSection = () => {
         return (
             <Flex
@@ -395,6 +425,7 @@ const SettingsView = forwardRef((props, ref) => {
             >
                 {renderGeneralSettings()}
                 {renderSearchSettings()}
+                {renderMapSettings()}
             </Flex>
         )
     }
