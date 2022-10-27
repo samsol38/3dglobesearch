@@ -1302,7 +1302,8 @@ const PlaceInfoView = (props) => {
                                                     align={'left'}
                                                     fontSize={'md'}>{`${favPlaceObj?.name?.value}`}</Text>
                                                 <Spacer />
-                                                <Tooltip label='Remove place from favourite places'>
+                                                <Tooltip label='Remove place from favourite places'
+                                                    key={'fav-tt'}>
                                                     <IconButton
                                                         variant={'solid'}
                                                         me={2}
@@ -1314,7 +1315,8 @@ const PlaceInfoView = (props) => {
                                                             as={BsFillStarFill}
                                                             boxSize={'15px'} />} />
                                                 </Tooltip>
-                                                <Tooltip label='Show place in 3D Globe'>
+                                                <Tooltip label='Show place in 3D Globe'
+                                                    key={'sp3dg-tt'}>
                                                     <IconButton
                                                         variant={'solid'}
                                                         onClick={() => {

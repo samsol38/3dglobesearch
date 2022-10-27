@@ -510,7 +510,6 @@ const SearchPlaceView = (props) => {
             <Flex
                 flex={1}
                 bg={'chakra-body-bg'}>
-
                 <AutoComplete
                     onSelectOption={(params) => {
                         onPressPlaceItem(params?.item?.originalValue);

@@ -19,6 +19,13 @@ import {
 import * as topojson from "topojson-client";
 import versor from "versor";
 import * as d3 from "d3";
+import SunCalc from 'suncalc';
+
+import {
+    line,
+    curveBasisClosed,
+    curveCatmullRom
+} from 'd3-shape';
 
 import './index.css';
 
@@ -77,6 +84,22 @@ const MasterGlobeView = (props) => {
     const globeDataObj = useRef({});
     const elementRefObj = useRef({});
     const pathRefObj = useRef({});
+
+    const suncalcOptionObj = useRef({
+        tickDur: 400,
+        shadowOpacity: 0.16,
+        lightsOpacity: 0.5,
+        sunOpacity: 0.20,
+        precisionLat: 1, // How many latitudinal degrees per point when checking solar position.
+        precisionLng: 10, // How may longitudial degrees per sunrise / sunset path point.
+        mapWidth: 1100,
+        mapHeight: 550,
+        refreshMap: true, // Periodically redraw map to keep current time
+        refreshMapInterval: 60000, // Update interval
+        bgColorLeft: '#42448A',
+        bgColorRight: '#376281',
+        lightsColor: '#FFBEA0'
+    });
 
     const updateGlobeData = (data) =>
         globeDataObj.current = {
@@ -175,6 +198,7 @@ const MasterGlobeView = (props) => {
             graticuleGroup: null,
             markerGroup: null,
             landGroup: null,
+            dayNightGroup: null,
 
             isDragStop: true,
             markerArray: [
@@ -232,6 +256,7 @@ const MasterGlobeView = (props) => {
             path: d3.geoPath(projection).context(context),
             tempPath: d3.geoPath(projection),
             pathOp: d3.geoPath(projection).context(contextOp),
+            geoCircle: d3.geoCircle()
         };
 
         // return;
@@ -334,6 +359,100 @@ const MasterGlobeView = (props) => {
         });
     }
 
+    const isDaylight = (obj) => {
+        return (obj.altitude > 0);
+    }
+
+    const isNorthSun = () => {
+        return isDaylight(SunCalc.getPosition(new Date(), 90, 0));
+    }
+
+    const getAllSunriseSunsetCoords = (northSun) => {
+
+        const {
+            precisionLat,
+            precisionLng
+        } = suncalcOptionObj.current;
+
+        let lng = -180;
+        let coords = [];
+        while (lng <= 180) {
+            coords.push([lng, getSunriseSunsetLatitude(lng, northSun)]);
+            lng += precisionLng;
+        }
+        return coords;
+    }
+
+    const getSunriseSunsetLatitude = (lng, northSun) => {
+
+        const {
+            precisionLat
+        } = suncalcOptionObj.current;
+
+        let delta, endLat, lat, startLat;
+        if (northSun) {
+            startLat = -90;
+            endLat = 90;
+            delta = precisionLat;
+        } else {
+            startLat = 90;
+            endLat = -90;
+            delta = -precisionLat;
+        }
+        lat = startLat;
+
+        while (lat !== endLat) {
+            if (isDaylight(SunCalc.getPosition(new Date(), lat, lng))) {
+                return lat;
+            }
+            lat += delta;
+        }
+        return lat;
+    }
+
+    const coordToXY = (coord) => {
+        let {
+            projection
+        } = elementRefObj.current;
+
+        let point = projection([coord[0], coord[1]]);
+        return point;
+    }
+
+    const getPath = (northSun) => {
+        const path = [];
+        const coords = getAllSunriseSunsetCoords(northSun);
+        // coords.forEach((val) => {
+        //     return path.push(coordToXY(val));
+        // });
+        return coords;
+    }
+
+    const getPathString = (northSun) => {
+        const {
+            width,
+            height
+        } = globeDataObj.current;
+
+        let path = getPath(northSun);
+
+        // const yStart = (northSun) ? 90 : 0;
+        // path.splice(0, 0, [0, yStart]);
+        // path.push([180, yStart])
+        // path.push([0, yStart])
+
+        var geoJsonPoint = {
+            type: "LineString",
+            coordinates: path,
+        }
+
+
+        // const lineFunction = line().x(function (d) { return d.x; }).y(function (d) { return d.y; }).curve(curveBasisClosed);
+        // return `M 0 ${yStart} ${lineFunction(path)} L  ${width}, ${yStart} L 0, ${yStart} `;
+
+        return geoJsonPoint;
+    }
+
     /*  UI Events Methods   */
 
     const clearDomElements = () => {
@@ -345,6 +464,7 @@ const MasterGlobeView = (props) => {
             landGroup,
             textGroup,
             markerGroup,
+            dayNightGroup
         } = globeDataObj.current;
 
         if (svgMarker) {
@@ -362,6 +482,7 @@ const MasterGlobeView = (props) => {
             landGroup: null,
             textGroup: null,
             markerGroup: null,
+            dayNightGroup: null,
 
             markerArray: [],
             markerLineArray: [],
@@ -394,6 +515,7 @@ const MasterGlobeView = (props) => {
             landGroup,
             textGroup,
             markerGroup,
+            dayNightGroup,
 
             countries,
             names,
@@ -578,6 +700,36 @@ const MasterGlobeView = (props) => {
             reloadMarker();
         }
 
+        const {
+            sunOpacity
+        } = suncalcOptionObj.current;
+
+        svgMarker
+            .append('defs')
+            .append('radialGradient')
+            .attr('id', 'radialGradient');
+
+        svgMarker.select('#radialGradient')
+            .append('stop')
+            .attr('offset', '0%')
+            .attr('stop-opacity', sunOpacity)
+            .attr('stop-color', "rgb(255, 255, 255)");
+
+        svgMarker.select('#radialGradient')
+            .append('stop')
+            .attr('offset', '100%')
+            .attr('stop-opacity', 0)
+            .attr('stop-color', 'rgb(255, 255, 255)');
+
+        svgMarker
+            .append('path')
+            // .attr('cx', 0)
+            // .attr('cy', 0)
+            .attr('id', 'sun')
+        // .attr('r', 0)
+        // .attr('opacity', 1)
+        // .attr('fill', 'url(#radialGradient)');
+
         updateElementRef({
             projection: projection
         });
@@ -586,6 +738,65 @@ const MasterGlobeView = (props) => {
             svg: svg,
             svgMarker: svgMarker
         });
+    }
+
+    const colorLuminance = (hex, lum = 0) => {
+        let c = null;
+        let i = 0;
+        let rgb = '#';
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6)
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+
+        while (i < 3) {
+            c = parseInt(hex.substr(i * 2, 2), 16);
+            c = Math.round(Math.min(Math.max(0, c + c * lum), 255)).toString(16);
+            rgb += ('00' + c).substr(c.length);
+            i++;
+        }
+        return rgb;
+    }
+
+    const getAllSunPositionsAtLng = (lng) => {
+        const {
+            precisionLng
+        } = suncalcOptionObj.current;
+
+        let alt, lat, peak, result;
+        lat = -90;
+        peak = 0;
+        result = [];
+        while (lat < 90) {
+            alt = SunCalc.getPosition(new Date(), lat, lng).altitude;
+            if (alt > peak) {
+                peak = alt;
+                result = [peak, lat];
+            }
+            lat += precisionLng;
+        }
+        return result;
+    }
+
+    const getSunPosition = () => {
+
+        const {
+            precisionLat
+        } = suncalcOptionObj.current;
+
+        let alt, coords, lng, peak, result;
+        lng = -180;
+        coords = [];
+        peak = 0;
+        while (lng < 180) {
+            alt = getAllSunPositionsAtLng(lng);
+            if (alt[0] > peak) {
+                peak = alt[0];
+                result = [lng, alt[1]];
+            }
+            lng += precisionLat;
+        }
+
+        return result;
     }
 
     const scale = () => {
@@ -630,7 +841,6 @@ const MasterGlobeView = (props) => {
         // render();
         window.requestAnimationFrame(render);
     }
-
 
     const reloadMarker = () => {
 
@@ -856,14 +1066,21 @@ const MasterGlobeView = (props) => {
             path
         }, countries, '#fff6')
 
-        if (markerLineArray.length > 1) {
-            markerLineArray.forEach((item) => {
-                strokePath({
-                    contextOp,
-                    pathOp
-                }, item, '#f00')
-            });
-        }
+        fill({
+            context,
+            path
+        }, water, '#0003');
+
+        renderSunObj();
+
+        // if (markerLineArray.length > 1) {
+        //     markerLineArray.forEach((item) => {
+        //         strokePath({
+        //             contextOp,
+        //             pathOp
+        //         }, item, '#f00')
+        //     });
+        // }
 
         textGroup.selectAll("text").attr("opacity", `${scaleFactor > 2 ? 1 : 0}`);
         landGroup.selectAll("path").remove();
@@ -881,6 +1098,160 @@ const MasterGlobeView = (props) => {
         if (scaleFactor >= 2) {
             renderText();
         }
+
+        renderDayNightPath();
+
+    }
+
+    const renderDayNightPath = () => {
+
+        let {
+            svg,
+            land,
+            colorLand
+        } = globeDataObj.current;
+
+        const {
+            shadowOpacity
+        } = suncalcOptionObj.current;
+
+        let {
+            context
+        } = elementRefObj.current;
+
+        let {
+            path,
+            tempPath
+        } = pathRefObj.current;
+
+        const geoPath = getPathString(isNorthSun());
+        // console.log(geoPath);
+
+
+        // context.stroke(path);
+        // let convertedGeoPath = tempPath.path(geoPath);
+
+        stroke({
+            context,
+            path,
+        }, geoPath, '#00f');
+    }
+
+    const renderSunObj = () => {
+        let {
+            svgMarker,
+            width,
+            height
+        } = globeDataObj.current;
+
+        let {
+            projection,
+            context
+        } = elementRefObj.current;
+
+        let {
+            tempPath,
+            path,
+            // geoCircle
+        } = pathRefObj.current;
+
+        const sunPos = getSunPosition();
+        let sunXYPos = projection(sunPos);
+
+        const sunRadius = width > height ? width / 2 : height / 2;
+
+        let geoCircle = d3.geoCircle().center([0.1278, 51.5074]).radius(5)
+
+        const config = {
+            radius: 90,
+            center: sunPos
+        }
+
+        // svgMarker.selectAll('#sun').remove();
+
+        // svgMarker.selectAll('path')
+        //     .append("path")
+        //     .datum({ endAngle: 0 })
+        //     // .attr("class", "geoCircle")
+        //     .attr("stroke-width", "1.5")
+        //     // .attr("stroke-dasharray", "5, 2")
+        //     .attr("stroke", '#f00')
+        //     .attr('id', 'sun')
+        //     // .attr("d", geoCircle())
+        //     .attr("d", d => {
+        //         console.log('d', path(geoCircle.center(config.center).radius(5)()));
+        //         return path(geoCircle.center(config.center).radius(20)());
+        //     });
+
+        // svgMarker.selectAll('#sun').remove();
+
+        // svgMarker.append("path")
+        //     .data({ endAngle: 0 })
+        //     .attr('id', 'sun')
+        //     // .attr("class", "geoCircle")
+        //     .attr("stroke-width", "1.5")
+        //     // .attr("stroke-dasharray", "5, 2")
+        //     .attr("stroke", '#f0f')
+        //     .attr("d", d => {
+        //         console.log('d', path(geoCircle.center(config.center).radius(5)()));
+        //         return path(geoCircle.center(config.center).radius(5)());
+        //     });
+
+        // var circle = d3.geoCircle().center([0.1278, 51.5074]).radius(5)
+        // context.beginPath();
+        // context.strokeStyle = 'red';
+        // geoGenerator(circle());
+        // context.stroke();
+
+        // var circle = d3.geoCircle().center(sunPos).radius(20)
+
+        // stroke({
+        //     context,
+        //     path
+        // }, circle(), '#f0f');
+
+        var circle = d3.geoCircle().center(sunPos).radius(90)
+
+        var grd = context.createRadialGradient(sunXYPos[0], sunXYPos[1], 60, sunXYPos[0], sunXYPos[1], 70);
+        grd.addColorStop(0.2, "#fff2");
+        grd.addColorStop(1, "#fff2");
+
+        // Fill with gradient
+
+
+        // context.beginPath();
+
+        // context.strokeStyle = 'red';
+        // context.lineWidth = 0.6;
+        // path(circle());
+        // context.stroke();
+
+        // const geoPath = getPathString(isNorthSun());
+
+        // context.beginPath();
+        // context.fillStyle = grd;
+        // path(geoPath);
+        // context.fill();
+
+        // svgMarker
+        //     .select('#sun')
+        //     .attr('cx', sunPos[0])
+        //     .attr('cy', sunPos[1])
+        //     .attr('visibility', getVisibility(tempPath, {
+        //         long: sunPos[0],
+        //         lat: sunPos[1]
+        //     }))
+        //     .attr("stroke-width", "1.5")
+        //     .attr("stroke-dasharray", "5, 2")
+        //     .attr("stroke", '#00f')
+        //     .attr("transform", function (d) {
+        //         return "translate(" + projection(sunPos) + ")";
+        //     })
+        //     .attr('r', sunRadius);
+
+        updateGlobeData({
+            svgMarker: svgMarker
+        });
     }
 
     const renderCanvasText = (obj, color) => {

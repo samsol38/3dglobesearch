@@ -119,6 +119,8 @@ const stroke = (refObj, obj, color) => {
         path
     } = refObj;
 
+    // console.log("obj: ", obj)
+
     context.beginPath()
     path(obj)
     context.shadowBlur = 0;

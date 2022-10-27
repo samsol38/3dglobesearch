@@ -425,6 +425,7 @@ const SettingsView = forwardRef((props, ref) => {
                         <ModalBody
                             m={0}
                             p={0}
+                            bg={'chakra-body-bg'}
                         >
                             {renderMasterSettingSection()}
                         </ModalBody>

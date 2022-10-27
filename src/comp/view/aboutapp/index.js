@@ -62,8 +62,16 @@ import {
 } from 'react-icons/fa'
 
 import {
+    FiPackage
+} from 'react-icons/fi'
+
+import {
     AiFillLike
 } from 'react-icons/ai'
+
+import {
+    BiLinkAlt
+} from 'react-icons/bi'
 
 import {
     connect
@@ -242,6 +250,10 @@ const AboutApp = forwardRef((props, ref) => {
             package: 'tz-lookup',
             npmURL: 'https://www.npmjs.com/package/tz-lookup',
             url: 'https://github.com/klinquist/tz-lookup'
+        },
+        placeDataBase: {
+            title: 'Countries States Cities Database',
+            url: 'https://github.com/dr5hn/countries-states-cities-database'
         }
     }
 
@@ -378,71 +390,60 @@ const AboutApp = forwardRef((props, ref) => {
                                             key={`libDesc-${index}`}>
                                             <Td
                                                 height={'100%'}>
-                                                <Code fontSize={'md'} colorScheme={'linkedin'}>{`${libObj?.title}`}</Code>
+                                                <Code fontSize={'sm'} colorScheme={'linkedin'}>{`${libObj?.title}`}</Code>
                                             </Td>
                                             <Td height={'100%'}>
                                                 <Stack
                                                     spacing={[1, 5]}
                                                     direction={['column']}
                                                     justifyContent={'center'}>
-                                                    <Link key={'libitem-1'}
-                                                        href={libObj?.npmURL}
-                                                        passHref
-                                                        target="_blank">
-                                                        <Button as="a"
-                                                            variant={'link'}>
-                                                            <Text
-                                                                as={'u'}
-                                                                fontSize={'md'}>
-                                                                {`${libObj?.package}@${libObj?.version}`}
-                                                            </Text>
-                                                        </Button>
-                                                    </Link>
-                                                    <Link
+                                                    {!lodash.isNil(libObj?.npmURL) &&
+                                                        <Flex
+                                                            flexDirection={'row'}
+                                                            key={'libitem-1'}>
+                                                            <Icon as={FiPackage}
+                                                                alignSelf={'center'}
+                                                                boxSize={'20px'} />
+                                                            <Link
+                                                                ms={2}
+                                                                href={libObj?.npmURL}
+                                                                passHref
+                                                                target="_blank">
+                                                                <Button as="a"
+                                                                    variant={'link'}>
+                                                                    <Text
+                                                                        as={'u'}
+                                                                        fontSize={'sm'}>
+                                                                        {`${libObj?.package}@${libObj?.version}`}
+                                                                    </Text>
+                                                                </Button>
+                                                            </Link>
+                                                        </Flex>}
+                                                    <Flex
+                                                        flexDirection={'row'}
                                                         pb={2}
-                                                        key={'libitem-2'}
-                                                        href={libObj?.url}
-                                                        passHref
-                                                        target="_blank">
-                                                        <Button as="a"
-                                                            variant={'link'}>
-                                                            <Text
-                                                                as={'u'}
-                                                                fontSize={'md'}>{`${libObj?.url}`}</Text>
-                                                        </Button>
-                                                    </Link>
-                                                    <Divider />
+                                                        key={'libitem-2'}>
+                                                        <Icon as={BiLinkAlt}
+                                                            alignSelf={'center'}
+                                                            boxSize={'20px'} />
+                                                        <Link
+                                                            ms={2}
+                                                            href={libObj?.url}
+                                                            passHref
+                                                            target="_blank">
+                                                            <Button as="a"
+                                                                variant={'link'}>
+                                                                <Text
+                                                                    as={'u'}
+                                                                    fontSize={'sm'}>{`${libObj?.url}`}</Text>
+                                                            </Button>
+                                                        </Link>
+                                                    </Flex>
                                                 </Stack>
                                             </Td>
                                         </Tr>
-
                                     )
                                 })}
-                                <Tr>
-                                    <Td height={'100%'}>
-                                        <Code fontSize={'md'} colorScheme={'linkedin'}>{`Countries States Cities Database`}</Code>
-                                    </Td>
-                                    <Td height={'100%'}>
-                                        <Stack
-                                            spacing={[1, 5]}
-                                            direction={['column']}
-                                            justifyContent={'center'}>
-                                            <Link
-                                                pb={2}
-                                                href={'https://github.com/dr5hn/countries-states-cities-database'}
-                                                passHref
-                                                target="_blank">
-                                                <Button as="a"
-                                                    variant={'link'}>
-                                                    <Text
-                                                        as={'u'}
-                                                        fontSize={'md'}>{`https://github.com/dr5hn/countries-states-cities-database`}</Text>
-                                                </Button>
-                                            </Link>
-                                            <Divider />
-                                        </Stack>
-                                    </Td>
-                                </Tr>
                             </Tbody>
                         </Table>
                     </TableContainer>
@@ -492,6 +493,7 @@ const AboutApp = forwardRef((props, ref) => {
                         <ModalBody
                             m={0}
                             p={0}
+                            bg={'chakra-body-bg'}
                         >
                             {renderMasterAboutAppSection()}
                         </ModalBody>
