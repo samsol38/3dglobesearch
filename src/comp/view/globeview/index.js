@@ -135,7 +135,7 @@ const MasterGlobeView = (props) => {
         // console.log('userPref?.appSettings: ', userPref?.appSettings)
         if (globeDataObj.current.isLoadedMap) {
             updateGlobeData({
-                enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? false
+                enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? true
             });
             window.requestAnimationFrame(render);
         }
@@ -215,7 +215,7 @@ const MasterGlobeView = (props) => {
             cityGroup: null,
 
             isLoadedMap: false,
-            enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? false,
+            enableDayNightMode: userPref?.appSettings?.enableDayNightMode ?? true,
             isDragStop: true,
             markerArray: [
                 {
@@ -427,21 +427,9 @@ const MasterGlobeView = (props) => {
         return lat;
     }
 
-    const coordToXY = (coord) => {
-        let {
-            projection
-        } = elementRefObj.current;
-
-        let point = projection([coord[0], coord[1]]);
-        return point;
-    }
-
     const getPath = (northSun) => {
         const path = [];
         const coords = getAllSunriseSunsetCoords(northSun);
-        // coords.forEach((val) => {
-        //     return path.push(coordToXY(val));
-        // });
         return coords;
     }
 
@@ -458,7 +446,6 @@ const MasterGlobeView = (props) => {
         // path.push([180, yStart])
         // path.push([0, yStart])
 
-
         let geoJsonObj = {
             "type": "Feature",
             "properties": {
@@ -469,7 +456,6 @@ const MasterGlobeView = (props) => {
                 "coordinates": [path]
             }
         }
-
 
         // const lineFunction = line().x(function (d) { return d.x; }).y(function (d) { return d.y; }).curve(curveBasisClosed);
         // return `M 0 ${yStart} ${lineFunction(path)} L  ${width}, ${yStart} L 0, ${yStart} `;
@@ -1619,7 +1605,8 @@ const MasterGlobeView = (props) => {
     const showCountry = () => {
         let {
             landGroup,
-            currentCountry
+            currentCountry,
+            enableDayNightMode
         } = globeDataObj.current;
 
         let {
@@ -1636,6 +1623,7 @@ const MasterGlobeView = (props) => {
             .attr("d", d3.geoPath()
                 .projection(projection)
             )
+            .attr("opacity", enableDayNightMode ? '0.6' : '1.0')
             .attr("fill", '#555')
             .attr("stroke-width", "1.85")
             .attr("stroke-dasharray", "5,3")
