@@ -1,37 +1,22 @@
 import React, {
-    Fragment,
     useState,
     useEffect,
     useRef
 } from 'react';
 
 import {
-    useDisclosure,
-    useColorMode,
-    Heading,
     Box,
     Text,
-    Input,
     Flex,
-    Button,
     IconButton,
     InputGroup,
     InputLeftElement,
     InputRightElement,
-    List,
-    ListItem,
-    ListIcon,
     Icon,
-    FormControl,
-    Divider,
-    Spacer,
+    Spacer
 } from "@chakra-ui/react"
 
 import {
-    HamburgerIcon,
-    MoonIcon,
-    SunIcon,
-    CheckIcon,
     CloseIcon,
     Search2Icon
 } from '@chakra-ui/icons'
@@ -49,10 +34,7 @@ import {
 } from 'react-icons/bs';
 
 import {
-    MdSettings,
-    MdCheckCircle,
-    MdLocationPin,
-    MdSearch
+    MdLocationPin
 } from 'react-icons/md';
 
 import {
@@ -63,6 +45,8 @@ import lodash from 'lodash';
 import * as geolib from 'geolib';
 
 import PlaceInfoView from './placeInfo';
+import MasterGlobeView from '../globeview';
+import NavBarView from '../navbar';
 
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
@@ -72,8 +56,6 @@ import MasterWorldArray from '../../data/info/countries+states+cities.json';
 
 const {
     MasterDrawerMenuType,
-    MasterDrawerMenuConfig,
-    MasterDrawerMenuArray,
     PlaceType,
     AppNotifKey
 } = Constants;
@@ -82,19 +64,18 @@ const SearchPlaceView = (props) => {
 
     const {
         userConfig,
-        userPref
+        userPref,
+        menuType = MasterDrawerMenuType.Search
     } = props;
-
-    const { colorMode } = useColorMode();
 
     const [state, setState] = useState({
         placeName: '',
-
         searchResultArray: [],
         placeItem: null,
         placeholder: 'Searching...',
         isSearching: false,
-        favPlaceArray: userPref?.favPlaceArray ?? []
+        favPlaceArray: userPref?.favPlaceArray ?? [],
+        isAppLoaded: false
     });
 
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -108,7 +89,26 @@ const SearchPlaceView = (props) => {
 
     useEffect(() => {
         // console.log("MasterWorldArray: ", MasterWorldArray[0])
+        props.setUserConfig({
+            ...userConfig,
+            selectedInputCoordinate: null,
+            isPlaceVisible: null,
+            selectedCountryCode: null,
+            selectedPlaceCoordinate: null,
+            selectedPlaceItem: null,
+        });
         addEventListener();
+        setTimeout(async () => {
+            await updateState({
+                isAppLoaded: true
+            });
+            await props.setUserConfig({
+                ...userConfig,
+                selectedMenuType: menuType
+            });
+
+            await props.setIsMasterAppLoading(false);
+        }, 800);
         return () => {
             removeEventListener();
         };
@@ -116,7 +116,6 @@ const SearchPlaceView = (props) => {
 
     useEffect(() => {
         let selectedCountryCode = userConfig?.selectedCountryCode;
-        let isPlaceVisible = userConfig?.isPlaceVisible;
 
         if (!lodash.isNil(selectedCountryCode)) {
             setCountryFromCountryCode(selectedCountryCode);
@@ -124,8 +123,11 @@ const SearchPlaceView = (props) => {
     }, [userConfig]);
 
     useEffect(() => {
-        // console.log("userPref1: ", userPref)
-    }, [userPref]);
+        props.setUserConfig({
+            ...userConfig,
+            selectedMenuType: menuType
+        });
+    }, [menuType]);
 
     useEffect(() => {
         clearSearchTimer();
@@ -179,7 +181,6 @@ const SearchPlaceView = (props) => {
         let nearByCityDistance = 2000;
         let nearByStateDistance = 80000;
         let nearByPlaceItem = null;
-        let nearByStateItem = null;
         let finalNearByPlaceItem = null;
 
         if (filterCountryArray.length > 0) {
@@ -297,7 +298,6 @@ const SearchPlaceView = (props) => {
     }
 
     const searchPlaceFromKeyword = (placeName) => {
-        let appSettingObj = userPref.appSettings ?? {};
 
         let isCountrySearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.Country);
         let isStateSearchEnabled = isSearchPlaceFromWithinSettings(PlaceType.State);
@@ -431,7 +431,7 @@ const SearchPlaceView = (props) => {
 
         updateState({
             isSearching: false,
-            placeholder: searchResultArray.length > 0 ? '' : 'No Result found',
+            placeholder: searchResultArray.length > 0 ? '' : 'No result found',
             searchResultArray: searchResultArray
         });
         // console.log("searchResultArray: ", filterCountryArray)
@@ -628,28 +628,44 @@ const SearchPlaceView = (props) => {
     }
 
     const renderMasterContainer = () => {
-        const searchResultLength = (state?.searchResultArray ?? []).length;
 
         return (
             <Flex
                 flex={1}
-                pointerEvents={'auto'}
-                pt={3}
-                ps={3}
-                pe={3}
-                flexDirection={'column'}
-                bg={'#000'}>
-                <Box
-                    borderRadius={'5px'}
-                    overflow={'hidden'}
-                    bg={'chakra-body-bg'}>
-                    {renderSearchResultList()}
-                </Box>
-                <Flex>
-                    <PlaceInfoView
-                        isPlaceVisible={userConfig?.isPlaceVisible}
-                        selectedPlaceCoordinate={userConfig?.selectedPlaceCoordinate}
-                        placeItem={state?.placeItem} />
+                direction={'column'}
+                visibility={state?.isAppLoaded ?
+                    'visible' : 'hidden'}>
+                <NavBarView />
+                <Flex
+                    flex={1}
+                    flexDirection={'row'}>
+                    <Flex
+                        flex={1}
+                        pointerEvents={'auto'}
+                        pt={3}
+                        ps={3}
+                        pe={3}
+                        flexDirection={'column'}
+                        bg={'#000'}>
+                        <Box
+                            borderRadius={'5px'}
+                            overflow={'hidden'}
+                            bg={'chakra-body-bg'}>
+                            {renderSearchResultList()}
+                        </Box>
+                        <Flex>
+                            <PlaceInfoView
+                                isPlaceVisible={userConfig?.isPlaceVisible}
+                                selectedPlaceCoordinate={userConfig?.selectedPlaceCoordinate}
+                                placeItem={state?.placeItem} />
+                        </Flex>
+                    </Flex>
+                    <Flex
+                        flex={2}
+                        overflow={'visible'}>
+                        {state?.isAppLoaded &&
+                            <MasterGlobeView />}
+                    </Flex>
                 </Flex>
             </Flex>
         )
@@ -663,13 +679,15 @@ const mapStateToProps = state => {
     return {
         userConfig: state.userConfig,
         userPref: state.userPref,
+        isMasterAppLoading: state.isMasterAppLoading
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         setUserConfig: (userConfig) => dispatch(Actions.setUserConfig(userConfig)),
-        setUserPref: (userPref) => dispatch(Actions.setUserPref(userPref))
+        setUserPref: (userPref) => dispatch(Actions.setUserPref(userPref)),
+        setIsMasterAppLoading: (isMasterAppLoading) => dispatch(Actions.setIsMasterAppLoading(isMasterAppLoading))
     };
 };
 

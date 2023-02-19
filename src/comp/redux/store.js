@@ -1,13 +1,13 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-import { persistStore, persistReducer } from 'redux-persist';
-import reducer from './reducer';
+import { createStore } from "redux";
+import { persistStore, persistReducer } from "redux-persist";
+import reducer from "./reducer";
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import storage from 'redux-persist/lib/storage';
+import storage from "redux-persist/lib/storage";
 
 const persistConfig = {
-    key: 'root',
-    storage: storage,
-    blacklist: ['userConfig'],
+	key: "root",
+	storage: storage,
+	blacklist: ["userConfig", "isMasterAppLoading"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducer);
@@ -21,5 +21,5 @@ export let store = createStore(persistedReducer);
 //     createStore(persistedReducer);
 
 export let persistor = persistStore(store, null, () => {
-    console.log('rehydrated');
+	console.log("rehydrated");
 });

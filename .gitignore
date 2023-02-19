@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 /.pnp
-/.firebase
+/.firebase/*.*
 .pnp.js
 
 # testing

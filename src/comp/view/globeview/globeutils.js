@@ -112,6 +112,36 @@ const fill = (refObj, obj, color) => {
     context.fill()
 }
 
+const fillClippedPath = (refObj, obj, clippedObj, color, clippedColor) => {
+
+    let {
+        context,
+        path
+    } = refObj;
+
+    context.beginPath()
+    path(obj)
+
+    context.shadowOffsetX = 3;
+    context.shadowOffsetY = 3;
+    context.shadowBlur = 5;
+    context.shadowColor = '#0008';
+
+    context.fillStyle = color
+    context.fill()
+    context.clip();
+
+    path(clippedObj)
+
+    context.shadowOffsetX = 3;
+    context.shadowOffsetY = 3;
+    context.shadowBlur = 5;
+    context.shadowColor = '#0008';
+
+    context.fillStyle = clippedColor
+    context.fill()
+}
+
 const fillCity = (refObj, obj, scaleFactor, radius, color, opacity) => {
 
     let {
@@ -209,6 +239,8 @@ export {
     fillLand,
     fillWater,
     fill,
+    fillClippedPath,
+
     fillCity,
 
     stroke,

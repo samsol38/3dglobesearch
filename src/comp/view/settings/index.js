@@ -2,21 +2,16 @@ import React, {
     Fragment,
     useState,
     useEffect,
-    useRef,
-    createRef,
     forwardRef,
     useImperativeHandle
 } from 'react';
 
 import {
     useDisclosure,
-    useColorMode,
-    Heading,
     Box,
     Text,
     Flex,
     Button,
-    IconButton,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -26,24 +21,13 @@ import {
     ModalFooter,
     Divider,
     useToast,
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionIcon,
-    AccordionPanel,
     RadioGroup,
     Radio,
     Stack,
     Checkbox,
     Switch,
     Spacer
-} from "@chakra-ui/react"
-
-import {
-    HamburgerIcon,
-    MoonIcon,
-    SunIcon
-} from '@chakra-ui/icons'
+} from "@chakra-ui/react";
 
 import {
     connect
@@ -144,7 +128,7 @@ const SettingsView = forwardRef((props, ref) => {
         userConfig,
         userPref
     } = props;
-
+    
     const [state, setState] = useState({
         searchPlaceFrom: [],
         searchPlaceSectionArray: [],
@@ -191,7 +175,10 @@ const SettingsView = forwardRef((props, ref) => {
     const preLoadSettings = () => {
         let appSettingObj = Object.assign({}, userPref?.appSettings ?? {});
         updateState({
-            ...appSettingObj
+            coordinateFormat: (appSettingObj?.coordinateFormat ?? []).slice(),
+            searchPlaceFrom: (appSettingObj?.searchPlaceFrom ?? []).slice(),
+            searchPlaceSectionArray: (appSettingObj?.searchPlaceSectionArray ?? []).slice(),
+            enableDayNightMode: appSettingObj?.enableDayNightMode ?? false
         });
     }
 
@@ -267,8 +254,12 @@ const SettingsView = forwardRef((props, ref) => {
 
         await props.setUserPref({
             ...userPref,
-            appSettings: appSettingObj
+            appSettings: {
+                ...(userPref?.appSettings ?? {}),
+                ...appSettingObj
+            }
         });
+
 
         toast({
             title: 'Settings saved.',
@@ -397,7 +388,7 @@ const SettingsView = forwardRef((props, ref) => {
                     pb={2}>
                     <Text
                         fontSize={'md'}
-                        fontWeight={'semibold'}
+                        // fontWeight={'semibold'}
                         mb={4}
                     >{'Enable Day-Night Mode'}</Text>
                     <Spacer />

@@ -1,129 +1,61 @@
-import React, {
-    Fragment,
-    useState,
-    useEffect,
-    useRef
-} from 'react';
+import React, { Fragment, useState, useEffect, useRef } from "react";
 
-import {
-    useDisclosure,
-    useColorMode,
-    Heading,
-    Box,
-    Text,
-    Divider,
-    Flex,
-    Button,
-    IconButton,
-} from "@chakra-ui/react"
+import { useDisclosure } from "@chakra-ui/react";
+import { connect } from "react-redux";
 
-import {
-    HamburgerIcon,
-    MoonIcon,
-    SunIcon
-} from '@chakra-ui/icons'
+import AppManager from "../../utils/AppManager";
+import Actions from "../../redux/action";
+import Constants from "../../utils/Constants";
 
-import {
-    connect
-} from 'react-redux';
+import SearchPlaceView from "../searchplaceview";
 
-import MasterGlobeView from '../globeview';
-import MasterGlobeRectView from '../globerectview';
-import MasterGlobePixiView from '../globepixiview';
-import SearchPlaceView from '../searchplaceview';
-
-import Actions from '../../redux/action';
-import Constants from '../../utils/Constants';
-
-const {
-    MasterDrawerMenuType,
-    MasterDrawerMenuConfig,
-    MasterDrawerMenuArray
-} = Constants;
+const { MasterDrawerMenuType, AppNotifKey } = Constants;
 
 const MasterContainer = (props) => {
+	const { userConfig } = props;
 
-    const {
-        userConfig
-    } = props;
+	const [state, setState] = useState({});
 
-    const [state, setState] = useState({
+	const updateState = (data) =>
+		setState((preState) => ({ ...preState, ...data }));
 
-    });
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const btnRef = useRef();
 
-    const updateState = (data) =>
-        setState((preState) => ({ ...preState, ...data }));
+	/*  Life-cycles Methods */
 
-    /*  Life-cycles Methods */
+	/*  Public Interface Methods */
 
-    useEffect(() => {
-        return () => {
-        };
-    }, []);
+	/*  UI Events Methods   */
 
+	/*  Server Request Methods  */
 
-    /*  Public Interface Methods */
+	/*  Server Response Methods  */
 
-    /*  UI Events Methods   */
+	/*  Server Response Handler Methods  */
 
-    /*  Server Request Methods  */
+	/*  Custom-Component sub-render Methods */
 
-    /*  Server Response Methods  */
+	const renderMasterContainer = () => {
+		return <SearchPlaceView menuType={MasterDrawerMenuType.Search} />;
+	};
 
-    /*  Server Response Handler Methods  */
-
-    /*  Custom-Component sub-render Methods */
-
-    const getOperationView = () => {
-        const menuType = userConfig?.selectedMenuType ?? MasterDrawerMenuType.Search;
-
-        switch (menuType) {
-            case MasterDrawerMenuType.Search: {
-
-                return (
-                    <SearchPlaceView />
-                )
-            }
-        }
-    }
-
-    const renderMasterContainer = () => {
-        return (
-            <>
-                <Flex
-                    flex={1}>
-                    <Flex
-                        flex={1}>
-                        {getOperationView()}
-                    </Flex>
-                    <Flex
-                        flex={2}
-                        overflow={'visible'}>
-                        <MasterGlobeView />
-                        {/* {<MasterGlobeRectView />} */}
-                        {/* <MasterGlobePixiView /> */}
-                    </Flex>
-                </Flex>
-            </>
-        )
-    }
-
-
-    return renderMasterContainer()
+	return renderMasterContainer();
 };
 
-const mapStateToProps = state => {
-    return {
-        userConfig: state.userConfig,
-        userPref: state.userPref,
-    };
+const mapStateToProps = (state) => {
+	return {
+		userConfig: state.userConfig,
+		userPref: state.userPref,
+	};
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        setUserConfig: (userConfig) => dispatch(Actions.setUserConfig(userConfig)),
-        setUserPref: (userPref) => dispatch(Actions.setUserPref(userPref))
-    };
+const mapDispatchToProps = (dispatch) => {
+	return {
+		setUserConfig: (userConfig) =>
+			dispatch(Actions.setUserConfig(userConfig)),
+		setUserPref: (userPref) => dispatch(Actions.setUserPref(userPref)),
+	};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MasterContainer);

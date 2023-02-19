@@ -6,13 +6,10 @@ import React, {
 } from 'react';
 
 import {
-    useDisclosure,
     useColorMode,
-    Heading,
     Box,
     Text,
     Flex,
-    Button,
     IconButton,
     Accordion,
     AccordionItem,
@@ -25,40 +22,29 @@ import {
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
     Td,
-    TableCaption,
     TableContainer,
     Spacer,
     Icon
 } from "@chakra-ui/react"
 
 import {
-    HamburgerIcon,
-    MoonIcon,
-    SunIcon,
     InfoIcon
 } from '@chakra-ui/icons'
 
 import {
-    BsFillStarFill,
-    BsStar
+    BsFillStarFill
 } from 'react-icons/bs';
 
 import {
-    MdSettings,
-    MdCheckCircle,
-    MdLocationPin,
-    MdSearch
+    MdLocationPin
 } from 'react-icons/md';
 
 import {
     connect
 } from 'react-redux';
-
-import * as geolib from 'geolib';
 
 import lodash from 'lodash';
 import tzlookup from 'tz-lookup';
@@ -307,7 +293,6 @@ const PlaceInfoView = (props) => {
         let currentPlaceItem = Object.assign({}, placeItem);
 
         let placeType = currentPlaceItem?.type;
-        let placeConfigObj = Object.assign({}, MasterPlaceConfig[currentPlaceItem?.type]);
         let placeDetailsObj = {};
 
 
@@ -513,7 +498,6 @@ const PlaceInfoView = (props) => {
         let currentPlaceItem = Object.assign({}, placeItemObj);
 
         let placeType = currentPlaceItem?.type;
-        let placeConfigObj = Object.assign({}, MasterPlaceConfig[currentPlaceItem?.type]);
         let placeDetailsObj = {};
 
         let inputCoordinate = {
@@ -823,7 +807,6 @@ const PlaceInfoView = (props) => {
         let filteredPostalCodeArray = postalCodeArray.filter((item) => {
             return item.ISO.toLowerCase() === countryCode.toLowerCase()
         });
-
 
         if (filteredPostalCodeArray.length > 0) {
             postalCodeObj = filteredPostalCodeArray[0];

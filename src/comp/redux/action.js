@@ -1,30 +1,18 @@
 import {
-    SET_USER_CONFIG,
-    SET_USER_PREF
-} from './action-types';
-
-import { REHYDRATE } from 'redux-persist/src/constants';
-
-import Constants from '../utils/Constants';
-
-const {
-    MasterDrawerMenuType,
-    CoordinateFormat,
-    PlaceType
-} = Constants;
-
-let initialState = {
-    userPref: {
-    },
-    userConfig: {
-        selectedMenuType: MasterDrawerMenuType.Search
-    },
-};
+	SET_USER_CONFIG,
+	SET_USER_PREF,
+	SET_MASTER_APP_LOADING,
+} from "./action-types";
 
 const setUserConfig = (userConfig) => ({ type: SET_USER_CONFIG, userConfig });
 const setUserPref = (userPref) => ({ type: SET_USER_PREF, userPref });
+const setIsMasterAppLoading = (isMasterAppLoading) => ({
+	type: SET_MASTER_APP_LOADING,
+	isMasterAppLoading,
+});
 
 export default {
-    setUserConfig,
-    setUserPref
+	setUserConfig,
+	setUserPref,
+	setIsMasterAppLoading,
 };

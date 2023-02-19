@@ -1,62 +1,118 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
-import React, {
-    useRef,
-    useEffect,
-    useState
-} from 'react';
+import React, { useEffect, useState, createRef } from "react";
 
-import {
-    Box,
-    Text,
-    Flex
-} from "@chakra-ui/react"
+import { Text, Flex, CircularProgress, useColorMode } from "@chakra-ui/react";
 
-import {
-    NavBarView,
-    DrawerView,
-    MasterContainer,
-    Constants
-} from './comp';
+import { MasterContainer, Constants, Actions } from "./comp";
 
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { connect } from "react-redux";
 
-const {
-    FirebaseConfig
-} = Constants;
-
-const app = initializeApp(FirebaseConfig);
-const analytics = getAnalytics(app);
+import lodash from "lodash";
+import AppManager from "./comp/utils/AppManager";
 
 const App = (props) => {
+	/*  Life-cycles Methods */
 
-    const [state, setState] = useState({
-        rehydrated: false
-    });
+	const { isMasterAppLoading } = props;
+	const { colorMode } = useColorMode();
 
-    const updateState = (data) =>
-        setState((preState) => ({ ...preState, ...data }));
+	const [state, setState] = useState({});
 
-    useEffect(() => {
+	const updateState = (data) =>
+		setState((preState) => ({ ...preState, ...data }));
 
-    }, []);
+	useEffect(() => {
+		props.setIsMasterAppLoading(true);
+	}, []);
 
-    return (
-        <>
-            <Flex
-                flex={1}
-                direction={'column'}>
-                <NavBarView />
-                <Flex
-                    flex={1}
-                    direction={'row'}>
-                    <MasterContainer />
-                </Flex >
-            </Flex >
-        </>
-    );
-}
+	/*  Public Interface Methods */
 
-export default App;
+	/*  Validation Methods  */
+
+	/*  UI Events Methods   */
+
+	/*  Custom-Component sub-render Methods */
+
+	const renderLoader = () => {
+		return (
+			<Flex
+				flexDirection={"row"}
+				position={"absolute"}
+				justifyItems={"center"}
+				alignSelf={"center"}
+				alignItems={"center"}
+				top={"0%"}
+				left={"0%"}
+				width={"100vw"}
+				height={"100vh"}
+				backdropFilter="auto"
+				backdropBlur="5px"
+				backdropBrightness={"50%"}
+				zIndex={150}
+			>
+				<Flex
+					flexDirection={"row"}
+					position={"absolute"}
+					justifyItems={"center"}
+					alignSelf={"center"}
+					alignItems={"center"}
+					top={"50%"}
+					left={"50%"}
+					boxShadow="lg"
+					transform={"translate(-50%, -50%)"}
+					backdropFilter="auto"
+					backdropBlur="5px"
+					backdropBrightness={"80%"}
+					borderWidth={1}
+					backgroundColor={
+						colorMode === "dark" ? "gray.700" : "gray.300"
+					}
+					borderColor={colorMode === "dark" ? "gray.700" : "gray.400"}
+					borderRadius={12}
+					px={6}
+					py={6}
+					zIndex={100}
+				>
+					<CircularProgress
+						isIndeterminate
+						thickness={10}
+						size={6}
+					/>
+					<Text
+						ms={3}
+						fontWeight={"semibold"}
+						fontSize={"medium"}
+					>
+						{"Loading ..."}
+					</Text>
+				</Flex>
+			</Flex>
+		);
+	};
+
+	return (
+		<>
+			<MasterContainer />
+			{isMasterAppLoading && !lodash.isNil(colorMode) && renderLoader()}
+		</>
+	);
+};
+
+const mapStateToProps = (state) => {
+	return {
+		userConfig: state.userConfig,
+		isMasterAppLoading: state.isMasterAppLoading,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		setUserConfig: (userConfig) =>
+			dispatch(Actions.setUserConfig(userConfig)),
+		setIsMasterAppLoading: (isMasterAppLoading) =>
+			dispatch(Actions.setIsMasterAppLoading(isMasterAppLoading)),
+	};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

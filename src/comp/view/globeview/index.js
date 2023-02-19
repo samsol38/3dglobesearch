@@ -6,26 +6,13 @@ import React, {
 } from 'react';
 
 import {
-    useDisclosure,
-    useColorMode,
-    Heading,
-    Box,
-    Text,
-    Flex,
-    Button,
-    IconButton
+    Flex
 } from "@chakra-ui/react";
 
 import * as topojson from "topojson-client";
 import versor from "versor";
 import * as d3 from "d3";
 import SunCalc from 'suncalc';
-
-import {
-    line,
-    curveBasisClosed,
-    curveCatmullRom
-} from 'd3-shape';
 
 import './index.css';
 
@@ -34,12 +21,9 @@ import {
 } from 'react-redux';
 
 import lodash from 'lodash';
-import DrawerView from '../drawer';
 
 import Actions from '../../redux/action';
 import Constants from '../../utils/Constants';
-
-import * as geolib from 'geolib';
 
 import {
     getVisibility,
@@ -48,10 +32,11 @@ import {
     // fillLand,
     // fillWater,
     fill,
+    // fillClippedPath,
     fillCity,
 
     stroke,
-    strokePath,
+    // strokePath,
     // fillPath
 } from './globeutils';
 
@@ -59,8 +44,7 @@ import {
 // import * as countriesTSV from "../../data/countries.tsv";
 
 const {
-    MasterDrawerMenuType,
-    MasterDrawerMenuConfig
+    MasterDrawerMenuType
 } = Constants;
 
 const MasterGlobeView = (props) => {
@@ -71,7 +55,8 @@ const MasterGlobeView = (props) => {
     } = props;
 
     const [state, setState] = useState({
-        selectedMenuType: userConfig?.selectedMenuType ?? MasterDrawerMenuType.Search
+        selectedMenuType: userConfig?.selectedMenuType ?? MasterDrawerMenuType.Search,
+        isGlobeLoaded: false
     });
 
     const updateState = (data) =>
@@ -124,7 +109,6 @@ const MasterGlobeView = (props) => {
     /*  Life-cycles Methods */
 
     useEffect(() => {
-        // console.log(containerRef.current.offsetWidth)
         initData();
         return () => {
         };
@@ -142,24 +126,25 @@ const MasterGlobeView = (props) => {
     }, [userPref?.appSettings]);
 
     useEffect(() => {
-        let selectedMenuType = state?.selectedMenuType;
-        let selectedPlaceItem = userConfig?.selectedPlaceItem;
-        let selectedInputCoordinate = userConfig?.selectedInputCoordinate;
+        if (state?.isGlobeLoaded) {
+            let selectedMenuType = state?.selectedMenuType;
+            let selectedPlaceItem = userConfig?.selectedPlaceItem;
+            let selectedInputCoordinate = userConfig?.selectedInputCoordinate;
 
-        if (selectedMenuType !== userConfig?.selectedMenuType) {
-            updateState({
-                selectedMenuType: userConfig?.selectedMenuType
-            });
+            if (selectedMenuType !== userConfig?.selectedMenuType) {
+                updateState({
+                    selectedMenuType: userConfig?.selectedMenuType
+                });
+            }
+
+            if (!lodash.isNil(selectedInputCoordinate)) {
+                moveMarkerToFindCountryByLatLong(selectedInputCoordinate);
+            }
+
+            if (!lodash.isNil(selectedPlaceItem)) {
+                showPlaceItem(selectedPlaceItem);
+            }
         }
-
-        if (!lodash.isNil(selectedInputCoordinate)) {
-            moveMarkerToFindCountryByLatLong(selectedInputCoordinate);
-        }
-
-        if (!lodash.isNil(selectedPlaceItem)) {
-            showPlaceItem(selectedPlaceItem);
-        }
-
     }, [userConfig]);
 
     /*  Public Interface Methods */
@@ -202,8 +187,8 @@ const MasterGlobeView = (props) => {
             r0: null,
             q0: null,
 
-            width: containerRef.current.offsetWidth,
-            height: containerRef.current.offsetHeight,
+            width: containerRef.current?.offsetWidth,
+            height: containerRef.current?.offsetHeight,
 
             currentCountry: null,
 
@@ -249,7 +234,6 @@ const MasterGlobeView = (props) => {
         const {
             canvas,
             canvasOp,
-            scaleFactor,
             width,
             height
         } = globeDataObj.current;
@@ -282,7 +266,7 @@ const MasterGlobeView = (props) => {
             let countries = topojson.feature(world, world?.objects?.countries)
 
             let names = {};
-            // console.log('countries: ', countryList)
+            // console.log('data loaded: ', containerRef.current);
 
             countryList.forEach((d, i) => {
                 names[d["country-code"]] = d.name
@@ -321,13 +305,8 @@ const MasterGlobeView = (props) => {
                 .translateExtent([[0, 0], [width, height]])
                 .on("zoom", (event) => {
                     let {
-                        canvas,
-                        canvasOp,
                         scaleFactor,
-                        transform
                     } = globeDataObj.current;
-
-                    let projection;
 
                     // canvas.attr("transform", event.transform)
 
@@ -387,7 +366,6 @@ const MasterGlobeView = (props) => {
     const getAllSunriseSunsetCoords = (northSun) => {
 
         const {
-            precisionLat,
             precisionLng
         } = suncalcOptionObj.current;
 
@@ -428,7 +406,6 @@ const MasterGlobeView = (props) => {
     }
 
     const getPath = (northSun) => {
-        const path = [];
         const coords = getAllSunriseSunsetCoords(northSun);
         return coords;
     }
@@ -468,14 +445,7 @@ const MasterGlobeView = (props) => {
     const clearDomElements = () => {
         let {
             svg,
-            svgMarker,
-            graticuleGroup,
-
-            landGroup,
-            textGroup,
-            markerGroup,
-            dayNightGroup,
-            cityGroup
+            svgMarker
         } = globeDataObj.current;
 
         if (svgMarker) {
@@ -517,7 +487,6 @@ const MasterGlobeView = (props) => {
 
             canvas,
             canvasOp,
-            scaleFactor,
 
             svg,
             svgMarker,
@@ -531,8 +500,7 @@ const MasterGlobeView = (props) => {
             cityGroup,
 
             countries,
-            names,
-            markerArray
+            names
         } = globeDataObj.current;
 
         let {
@@ -544,8 +512,8 @@ const MasterGlobeView = (props) => {
             path
         } = pathRefObj.current;
 
-        width = containerRef.current.offsetWidth;
-        height = containerRef.current.offsetHeight;
+        width = containerRef.current?.offsetWidth;
+        height = containerRef.current?.offsetHeight;
 
         canvas.attr('width', width).attr('height', height)
         canvasOp.attr('width', width).attr('height', height)
@@ -769,6 +737,10 @@ const MasterGlobeView = (props) => {
             svg: svg,
             svgMarker: svgMarker
         });
+
+        updateState({
+            isGlobeLoaded: true
+        });
     }
 
     const colorLuminance = (hex, lum = 0) => {
@@ -850,33 +822,12 @@ const MasterGlobeView = (props) => {
         let {
             width,
             height,
-
-            canvas,
-            canvasOp,
-            scaleFactor,
-
-            svg,
-            svgMarker,
-            graticuleGroup,
-            colorGraticule,
-
-            landGroup,
-            textGroup,
-            markerGroup,
-
-            countries,
-            names,
-            markerArray
+            scaleFactor
         } = globeDataObj.current;
 
         let {
             projection,
-            graticule
         } = elementRefObj.current;
-
-        let {
-            path
-        } = pathRefObj.current;
 
         projection
             .scale((scaleFactor * Math.min(width, height)) / 2);
@@ -894,17 +845,10 @@ const MasterGlobeView = (props) => {
         let {
             markerGroup,
             markerArray,
-            markerSize,
-            selectedMarkerID
+            markerSize
         } = globeDataObj.current;
 
         let {
-            projection,
-            graticule
-        } = elementRefObj.current;
-
-        let {
-            path,
             tempPath
         } = pathRefObj.current;
 
@@ -1059,46 +1003,56 @@ const MasterGlobeView = (props) => {
             colorWater,
             colorGraticule,
             colorLand,
-            colorPolygon,
             water,
             land,
             countries,
-            markerLineArray,
-            markerPolygonArray,
-
-            currentCountry,
             scaleFactor,
-            markerSize,
 
             textGroup,
             landGroup,
             cityGroup,
             dayNightGroup,
             markerGroup,
-            selectedCounytryID,
             enableDayNightMode
         } = globeDataObj.current;
 
         let {
-            projection,
             graticule,
             context,
             contextOp
         } = elementRefObj.current;
 
         let {
-            path,
-            pathOp,
-            tempPath
+            path
         } = pathRefObj.current;
 
         context.clearRect(0, 0, width, height);
         contextOp.clearRect(0, 0, width, height);
 
-        fill({
-            context,
-            path
-        }, water, colorWater);
+        // fill({
+        //     context,
+        //     path
+        // }, water, colorWater);
+
+        if (enableDayNightMode) {
+            fill({
+                context,
+                path
+            }, water, colorWater);
+
+            fill({
+                context,
+                path
+            }, water, '#00000066');
+
+            renderDayNightPath();
+        } else {
+            cityGroup.selectAll("circle").remove();
+            fill({
+                context,
+                path
+            }, water, colorWater);
+        }
 
         stroke({
             context,
@@ -1121,14 +1075,14 @@ const MasterGlobeView = (props) => {
 
         if (enableDayNightMode) {
             renderCities();
-            fill({
-                context,
-                path
-            }, water, '#0005');
+            // renderDayNightPath();
+            // fill({
+            //     context,
+            //     path
+            // }, water, '#0005');
         } else {
             cityGroup.selectAll("circle").remove();
         }
-
 
         // renderSunObj();
 
@@ -1160,7 +1114,7 @@ const MasterGlobeView = (props) => {
         }
 
         if (enableDayNightMode) {
-            renderDayNightPath();
+            // renderDayNightPath();
         } else {
             dayNightGroup.selectAll("path").remove();
         }
@@ -1169,18 +1123,12 @@ const MasterGlobeView = (props) => {
     const renderCities = () => {
 
         let {
-            svg,
-            land,
-            colorLand,
-            svgMarker,
-            dayNightGroup,
             cityGroup,
             cities,
             scaleFactor
         } = globeDataObj.current;
 
         const {
-            shadowOpacity,
             lightsColor
         } = suncalcOptionObj.current;
 
@@ -1242,7 +1190,10 @@ const MasterGlobeView = (props) => {
                     //     // .attr('id', id)
                     //     .attr('r', cityRadius * scaleFactor * 2)
                     //     // .attr('opacity', opacity * this.options.lightsOpacity)
-                    //     .attr('fill', lightsColor);
+                    //     .attr('fill', lightsColor)
+                    //     .html(`<animate attributeName="opacity"
+                    //     values="0;1;0" dur="${Math.floor(Math.random() * 20)}s"
+                    //     repeatCount="indefinite"/>`);
 
                     fillCity({
                         context,
@@ -1253,36 +1204,27 @@ const MasterGlobeView = (props) => {
         })
     }
 
-    const renderSVGCities = (countryCode) => {
+    const renderDayNightPath = () => {
 
         let {
-            svg,
-            land,
-            colorLand,
-            svgMarker,
-            dayNightGroup,
-            cityGroup,
-            cities,
-            scaleFactor
+            colorGraticule
         } = globeDataObj.current;
 
-        const {
-            shadowOpacity,
-            lightsColor,
-            lightsOpacity
-        } = suncalcOptionObj.current;
-
         let {
-            context,
-            projection
+            context
         } = elementRefObj.current;
 
         let {
-            path,
-            tempPath
+            path
         } = pathRefObj.current;
 
-        cityGroup.selectAll("circle").remove();
+        const geoPath = getPathString(isNorthSun());
+        // console.log(geoPath);
+
+        // context.stroke(path);
+        // let convertedGeoPath = tempPath.path(geoPath);
+
+        // dayNightGroup.selectAll("path").remove();
 
         // dayNightGroup
         //     .selectAll('path')
@@ -1299,103 +1241,19 @@ const MasterGlobeView = (props) => {
         //     .attr("stroke-width", "1.8")
         //     .attr("stroke", '#f002')
 
-        cities?.forEach((cityObj, index) => {
-            // console.log("cityObj: ", cityObj)
-            let coords = [parseFloat(cityObj[2]), parseFloat(cityObj[3])];
+        // updateGlobeData({
+        //     dayNightGroup: dayNightGroup
+        // });
 
-            let geoPath = {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [parseFloat(cityObj[3]), parseFloat(cityObj[2])]
-                },
-            }
-
-            const opacity = getCityOpacity(coords);
-
-            if (opacity > 0) {
-                let isVisible = getVisibility(tempPath, {
-                    long: cityObj[3],
-                    lat: cityObj[2]
-                }) === 'visible';
-
-                if (isVisible) {
-                    let placePoint = projection([parseFloat(cityObj[3]), parseFloat(cityObj[2])]);
-                    let cityRadius = getCityRadius(cityObj[0]);
-
-                    cityGroup
-                        .append('circle')
-                        .attr('cx', placePoint[0])
-                        .attr('cy', placePoint[1])
-                        // .attr('id', id)
-                        .attr('r', cityRadius * scaleFactor * 2)
-                        .attr('opacity', 0.1)
-                        .attr('fill', lightsColor);
-
-                    // fillCity({
-                    //     context,
-                    //     path,
-                    // }, placePoint, scaleFactor, cityRadius, lightsColor, opacity);
-                }
-            }
-        })
-    }
-
-    const renderDayNightPath = () => {
-
-        let {
-            svg,
-            land,
-            colorLand,
-            svgMarker,
-            dayNightGroup
-        } = globeDataObj.current;
-
-        const {
-            shadowOpacity
-        } = suncalcOptionObj.current;
-
-        let {
+        fill({
             context,
-            projection
-        } = elementRefObj.current;
-
-        let {
             path,
-            tempPath
-        } = pathRefObj.current;
+        }, geoPath, '#74ccf466');
 
-        const geoPath = getPathString(isNorthSun());
-        // console.log(geoPath);
-
-        // context.stroke(path);
-        // let convertedGeoPath = tempPath.path(geoPath);
-
-        dayNightGroup.selectAll("path").remove();
-
-        dayNightGroup
-            .selectAll('path')
-            .data([geoPath])
-            .enter()
-            .append("path")
-            .attr("d", d3.geoPath()
-                .projection(projection)
-            )
-            .attr("fill", '#fff')
-            .attr("opacity", '0.08')
-            // .attr('fill', 'url(#radialGradient)')
-            .attr("stroke-dasharray", "5, 2")
-            .attr("stroke-width", "1.8")
-            .attr("stroke", '#f002')
-
-        updateGlobeData({
-            dayNightGroup: dayNightGroup
-        });
-
-        // stroke({
-        //     context,
-        //     path,
-        // }, geoPath, '#00f');
+        stroke({
+            context,
+            path,
+        }, geoPath, colorGraticule);
     }
 
     const renderSunObj = () => {
