@@ -1,5 +1,4 @@
 <div align="center">
-    <br/>
     <h1>3D Globe Search Web App in React.js by SamSol</h1>
     <img src="https://webapps-b7f67.web.app/3dglobesearch.png" width='800'/>
 </div>
