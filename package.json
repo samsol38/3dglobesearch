@@ -34,7 +34,7 @@
 	},
 	"scripts": {
 		"//start": "react-scripts start",
-		"start": "DISABLE_ESLINT_PLUGIN=true BROWSER=none PORT=3001 react-scripts start",
+		"start": "DISABLE_ESLINT_PLUGIN=true BROWSER=none PORT=3000 react-scripts start",
 		"build": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
 		"build-deploy": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build && firebase deploy",
 		"test": "react-scripts test",

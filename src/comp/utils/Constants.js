@@ -18,11 +18,6 @@ const AppNotifKey = {
 
 const MasterDrawerMenuType = {
 	Search: 1,
-	Location: 2,
-	Path: 3,
-	Area: 4,
-	Options: 5,
-	About: 10,
 };
 
 const MasterDrawerMenuConfig = {
@@ -32,13 +27,6 @@ const MasterDrawerMenuConfig = {
 		mainTitle: "3D Globe Search",
 		icon: FaGlobeAfrica,
 		route: "/",
-	},
-
-	[MasterDrawerMenuType.About]: {
-		type: MasterDrawerMenuType.About,
-		title: "About",
-		mainTitle: "About",
-		icon: MdOutlinePersonPin,
 	},
 };
 

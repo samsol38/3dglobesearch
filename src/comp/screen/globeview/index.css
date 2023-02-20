@@ -1,0 +1,40 @@
+.globeContainer {
+	position: relative;
+	overflow: hidden;
+}
+
+.globe {
+	cursor: move;
+	top: 0;
+	left: 0;
+	position: absolute;
+}
+
+.operation {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+
+.globesvg {
+	cursor: move;
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+
+svg #land {
+	animation: dash 4s linear 0s infinite alternate;
+}
+
+@keyframes dash {
+	from {
+		stroke-dashoffset: 19;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}

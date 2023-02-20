@@ -4,7 +4,9 @@ import React, { useEffect, useState, createRef } from "react";
 
 import { Text, Flex, CircularProgress, useColorMode } from "@chakra-ui/react";
 
-import { MasterContainer, Constants, Actions } from "./comp";
+import MasterContainer from "./comp/screen/mastercontainer";
+import Constants from "./comp/utils";
+import Actions from "./comp/redux/action";
 
 import { connect } from "react-redux";
 
