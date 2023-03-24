@@ -18,7 +18,7 @@ Features:
 
 Live Demo:
 
--   http://webapps-b7f67.web.app
+-   https://samswebapps.netlify.app
 
 ---
 
