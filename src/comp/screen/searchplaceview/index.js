@@ -702,6 +702,9 @@ const SearchPlaceView = (props) => {
 						>
 							{renderSearchResultList()}
 						</Box>
+
+						<Flex className="css-1wz2md5" pt={3} pb={3} ps={3} pe={3} bg={"chakra-body-bg"} mt={2} visibility={userConfig?.isPlaceVisible ? "visible" : "hidden"} position={userConfig?.isPlaceVisible ? "relative" : "absolute"}> {state?.placeItem?.name} Temperature is : 100&deg;C</Flex>
+
 						<Flex>
 							<PlaceInfoView
 								isPlaceVisible={userConfig?.isPlaceVisible}
