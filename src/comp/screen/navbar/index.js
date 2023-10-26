@@ -17,8 +17,6 @@ import {
 	SettingsIcon,
 } from "@chakra-ui/icons";
 
-import { FaGlobeAfrica } from "react-icons/fa";
-
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
 import { connect } from "react-redux";
@@ -100,11 +98,7 @@ const NavBarView = (props) => {
 						alignItems="center"
 						paddingY={1}
 					>
-						<Icon
-							alignSelf={"center"}
-							as={FaGlobeAfrica}
-							boxSize={"25px"}
-						/>
+						<img src="./globe-nav.svg" width="30px"/>
 						<Flex
 							flexDirection={"row"}
 							alignItems="center"

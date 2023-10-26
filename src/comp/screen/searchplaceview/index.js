@@ -40,6 +40,7 @@ import AppManager from "../../utils/AppManager";
 
 import MasterWorldArray from "../../data/info/countries+states+cities.json";
 
+import Weather from "../weather";
 const { MasterDrawerMenuType, PlaceType, AppNotifKey } = Constants;
 
 const SearchPlaceView = (props) => {
@@ -59,12 +60,42 @@ const SearchPlaceView = (props) => {
 		isAppLoaded: false,
 	});
 
+	const [shouldRender, setShouldRender] = useState(false);
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+		  setShouldRender(true);
+		}, 1000); 
+		return () => clearTimeout(timeoutId);
+	  }, []);
+
+	  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+	  useEffect(() => {
+		function handleWindowResize() {
+		  setIsMobile(window.innerWidth <= 768);
+		}
+	
+		// Add an event listener to handle window resize
+		window.addEventListener('resize', handleWindowResize);
+	
+		// Clean up the event listener on component unmount
+		return () => {
+		  window.removeEventListener('resize', handleWindowResize);
+		};
+	  }, []);
+
 	const [searchKeyword, setSearchKeyword] = useState("");
 
 	const updateState = (data) =>
 		setState((preState) => ({ ...preState, ...data }));
 
 	let searchTimer = useRef();
+
+	const [liveLocation, setLiveLocation] = useState(['','']);
+
+	const updateLiveLocation = (lat,long) => {
+		setLiveLocation(lat,long);
+	};
 
 	/*  Life-cycles Methods */
 
@@ -85,6 +116,7 @@ const SearchPlaceView = (props) => {
 			await props.setUserConfig({
 				...userConfig,
 				selectedMenuType: menuType,
+				isPlaceVisible: true,
 			});
 
 			await props.setIsMasterAppLoading(false);
@@ -522,7 +554,6 @@ const SearchPlaceView = (props) => {
 	/*  Server Response Handler Methods  */
 
 	/*  Custom-Component sub-render Methods */
-
 	const renderSearchResultList = () => {
 		return (
 			<Flex
@@ -684,7 +715,7 @@ const SearchPlaceView = (props) => {
 				<NavBarView />
 				<Flex
 					flex={1}
-					flexDirection={"row"}
+					css={{flexDirection : isMobile ? 'column' : 'row'}}
 				>
 					<Flex
 						flex={1}
@@ -703,23 +734,42 @@ const SearchPlaceView = (props) => {
 							{renderSearchResultList()}
 						</Box>
 
-						<Flex className="css-1wz2md5" pt={3} pb={3} ps={3} pe={3} bg={"chakra-body-bg"} mt={2} visibility={userConfig?.isPlaceVisible ? "visible" : "hidden"} position={userConfig?.isPlaceVisible ? "relative" : "absolute"}> {state?.placeItem?.name} Temperature is : 100&deg;C</Flex>
+						<Flex 
+							flexDir="column" 
+							className="css-1wz2md5" 
+							pt={3} 
+							pb={3} 
+							ps={3} 
+							pe={3} 
+							bg={"chakra-body-bg"} 
+							mt={2} 
+							borderRadius={"5px"}
+							visibility={userConfig?.isPlaceVisible ? "visible" : "hidden"} 
+							position={userConfig?.isPlaceVisible ? "relative" : "absolute"}>
+							<Weather latitude={state?.placeItem?.latitude} longitude={state?.placeItem?.longitude} placeName={state?.placeItem?.name}
+							updateLiveLocation={updateLiveLocation}
+							/>
+						</Flex>	
 
 						<Flex>
-							<PlaceInfoView
+							{state?.isAppLoaded && <PlaceInfoView
+								latitude={liveLocation[0]}
+								longitude={liveLocation[1]}
 								isPlaceVisible={userConfig?.isPlaceVisible}
 								selectedPlaceCoordinate={
 									userConfig?.selectedPlaceCoordinate
 								}
 								placeItem={state?.placeItem}
-							/>
+							/>}
 						</Flex>
 					</Flex>
 					<Flex
 						flex={2}
 						overflow={"visible"}
 					>
-						{state?.isAppLoaded && <MasterGlobeView />}
+						{shouldRender && state?.isAppLoaded && <MasterGlobeView 
+							latitude={liveLocation[0]} 
+							longitude={liveLocation[1]}  />}	
 					</Flex>
 				</Flex>
 			</Flex>
