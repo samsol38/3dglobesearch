@@ -32,9 +32,12 @@ import {
 	Link,
 	TableContainer,
 	Icon,
+	List,
+	UnorderedList,
+	ListItem
 } from "@chakra-ui/react";
 
-import { FaLinkedin, FaStackOverflow } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaStackOverflow } from "react-icons/fa";
 
 import { FiPackage } from "react-icons/fi";
 
@@ -305,6 +308,25 @@ const AboutApp = forwardRef((props, ref) => {
 							)}
 						</Box>
 					</Flex>
+					<Flex
+						flexDirection={"row"}
+						mb={2}
+					>
+						<Icon
+							as={FaGithub}
+							alignSelf={"center"}
+							boxSize={"20px"}
+						/>
+						<Box
+							ms={2}
+							alignContent={"center"}
+						>
+							{renderLinkButtonControl(
+								"Original Github Repository",
+								"https://github.com/samsol38/3dglobesearch"
+							)}
+						</Box>
+					</Flex>
 					<Flex flexDirection={"row"}>
 						<Icon
 							as={FaStackOverflow}
@@ -320,6 +342,78 @@ const AboutApp = forwardRef((props, ref) => {
 								"https://stackoverflow.com/users/447161/samsol"
 							)}
 						</Box>
+					</Flex>
+				</Flex>
+			</AboutAppSectionView>
+		);
+	};
+
+	const renderAboutContributerSection = () => {
+		return (
+			<AboutAppSectionView title={"About Contributer"}>
+				<Flex
+					flex={1}
+					flexDirection={"column"}
+					p={5}
+				>
+					<Text
+						fontSize={"md"}
+						fontWeight={"semibold"}
+						mb={4}
+					>
+						{"Apoorv Nema"}
+					</Text>
+					<Flex
+						flexDirection={"row"}
+						mb={2}
+					>
+						<Icon
+							as={FaLinkedin}
+							alignSelf={"center"}
+							boxSize={"20px"}
+						/>
+						<Box
+							ms={2}
+							alignContent={"center"}
+						>
+							{renderLinkButtonControl(
+								"https://linkedin.com/in/apoorvnema",
+								"https://linkedin.com/in/apoorvnema"
+							)}
+						</Box>
+					</Flex>
+					<Flex
+						flexDirection={"row"}
+						mb={2}
+					>
+						<Icon
+							as={FaGithub}
+							alignSelf={"center"}
+							boxSize={"20px"}
+						/>
+						<Box
+							ms={2}
+							alignContent={"center"}
+						>
+							{renderLinkButtonControl(
+								"Updated Github Repository",
+								"https://github.com/apoorvnema/3dglobesearch"
+							)}
+						</Box>
+					</Flex>
+					<Flex flexDirection={"column"}>
+					<Text
+						fontSize={"md"}
+						fontWeight={"semibold"}
+					>
+						{"Features Added:"}
+					</Text>
+					<UnorderedList ml="50px" listStyleType="circle" color="blue.500" fontSize="lg">
+						<ListItem>Weather Updates by search and select for cities and countries.</ListItem>
+						<ListItem>Getting live location update on startup.</ListItem>
+						<ListItem>Minor build & UI Changes.</ListItem>
+						<ListItem>Optimization for mobile devices.</ListItem>
+					</UnorderedList>
 					</Flex>
 				</Flex>
 			</AboutAppSectionView>
@@ -500,6 +594,7 @@ const AboutApp = forwardRef((props, ref) => {
 				overflowY={"auto"}
 			>
 				{renderAboutDeveloperSection()}
+				{renderAboutContributerSection()}
 				{renderAboutLibrarySection()}
 			</Flex>
 		);

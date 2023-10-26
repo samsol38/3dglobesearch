@@ -127,13 +127,14 @@ const TimeZoneConfig = {
 
 const PlaceInfoView = (props) => {
 	const {
+		longitude,
+		latitude,
 		userConfig,
 		userPref,
 		placeItem,
 		isPlaceVisible,
 		selectedPlaceCoordinate,
 	} = props;
-
 	const { colorMode } = useColorMode();
 
 	const [state, setState] = useState({
@@ -149,8 +150,8 @@ const PlaceInfoView = (props) => {
 		setState((preState) => ({ ...preState, ...data }));
 
 	const [coordinate, setCoordinate] = useState({
-		latitude: 0.0,
-		longitude: 0.0,
+		latitude: latitude,
+		longitude: longitude,
 	});
 
 	const updateCoordinate = (data) =>

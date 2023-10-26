@@ -124,10 +124,14 @@ const MasterGlobeView = (props) => {
 	/*  Public Interface Methods */
 
 	const initData = () => {
-		clearDomElements();
-
+		
+		const r = d3.interpolate(
+			[-0.1278, -51.54],
+			[-props.latitude, -props.longitude]
+		);
+		const [newX, newY] = r(1);
 		let { svg, svgMarker } = globeDataObj.current;
-
+		clearDomElements();
 		if (!svg) {
 			updateGlobeData({
 				svg: d3.select(svgRef.current),
@@ -148,8 +152,8 @@ const MasterGlobeView = (props) => {
 			},
 
 			angles: {
-				x: -20,
-				y: 40,
+				x: newX,
+				y: newY,
 				z: 0,
 			},
 
@@ -176,8 +180,8 @@ const MasterGlobeView = (props) => {
 			markerArray: [
 				{
 					id: "mark1",
-					lat: 0.0,
-					long: 0.0,
+					lat: props.latitude,
+					long: props.longitude,
 				},
 			],
 			markerLineArray: [],
@@ -1519,7 +1523,6 @@ const MasterGlobeView = (props) => {
 				);
 				return (t) => {
 					let { projection } = elementRefObj.current;
-
 					projection.rotate(r(t));
 					updateElementRef({
 						projection: projection,

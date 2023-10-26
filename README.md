@@ -1,6 +1,6 @@
 <div align="center">
-    <h1>3D Globe Search Web App in React.js by SamSol</h1>
-    <img src="https://webapps-b7f67.web.app/3dglobesearch.png" width='800'/>
+    <h1>Geo Weather 3D App by Apoorv Nema</h1>
+    <img src="https://geoweather3d.apoorvnema.pro/3dglobesearch.png" width='800'/>
 </div>
 
 ---
@@ -16,17 +16,25 @@ Features:
 
 ---
 
+ Added Features:
+
+-   Weather Updates by search and select for cities and countries.
+-	Getting live location update on startup.
+-	Minor build & UI Changes.
+-	Optimization for mobile devices.
+
+---
+
 Live Demo:
 
--   https://samswebapps.netlify.app
+-   https://geoweather3d.apoorvnema.pro
 
 ---
 
-Demo Video about how to use:
+Note:
 
--   https://www.youtube.com/watch?v=gLhoaBanCnc
-
----
+-   Remember to add file .env in root folder with REACT_APP_WEATHER_API="API KEY" for weather functionality to work.
+-   You can get Weather API KEY from https://openweathermap.org/api
 
 Run Project:
 
@@ -40,21 +48,5 @@ Create Distribution Build:
 
 -   Run `yarn build` or `npm build`
 -   Deploy `./build` folder
-
----
-
-Any queries Contact me: http://linkedin.com/in/samir38
-
-Also Explore English Dictionary Webapp in React.js [Source code not released yet.]: http://webapps-b7f67.web.app/endict?word=mind
-
-English Dictionary Webapp Screenshot: http://webapps-b7f67.web.app/endictionary.png
-
-English Dictionary Webapp Demo Video: https://www.youtube.com/watch?v=nLDcgignnFA
-
-If you like dictionary, please share your feedback in my post for same: https://www.linkedin.com/posts/samir38_reactjs-react-webappdevelopment-activity-6999375808641331200-GrOq?utm_source=share&utm_medium=member_desktop
-
-Keep on Coding & Keep Learning.
-
-Thank you. 😊 👍
 
 ---
