@@ -1,6 +1,6 @@
 <div align="center">
     <h1>3D Globe Search Web App in React.js by SamSol</h1>
-    <img src="https://webapps-b7f67.web.app/3dglobesearch.png" width='800'/>
+    <img src="https://webapps-b7f67.firebaseapp.com/3dglobesearch.png" width='800'/>
 </div>
 
 ---
@@ -45,9 +45,9 @@ Create Distribution Build:
 
 Any queries Contact me: http://linkedin.com/in/samir38
 
-Also Explore English Dictionary Webapp in React.js [Source code not released yet.]: http://webapps-b7f67.web.app/endict?word=mind
+Also Explore English Dictionary Webapp in React.js [Source code not released yet.]: http://webapps-b7f67.firebaseapp.com/endict?word=mind
 
-English Dictionary Webapp Screenshot: http://webapps-b7f67.web.app/endictionary.png
+English Dictionary Webapp Screenshot: http://webapps-b7f67.firebaseapp.com/endictionary.png
 
 English Dictionary Webapp Demo Video: https://www.youtube.com/watch?v=nLDcgignnFA
 
