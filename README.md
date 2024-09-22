@@ -1,6 +1,6 @@
 <div align="center">
     <h1>Geo Weather 3D App by Apoorv Nema</h1>
-    <img src="https://geoweather3d.apoorvnema.pro/3dglobesearch.png" width='800'/>
+    <img src="https://geoweather3d.apoorvnema.com/3dglobesearch.png" width='800'/>
 </div>
 
 ---
@@ -27,7 +27,7 @@ Features:
 
 Live Demo:
 
--   https://geoweather3d.apoorvnema.pro
+-   https://geoweather3d.apoorvnema.com
 
 ---
 
